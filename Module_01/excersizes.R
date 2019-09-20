@@ -63,7 +63,10 @@ cor(MSReturn, MRKReturn)
 
 plot(MSReturn, logMSReturn)
 
-# Simulations
+######################################################
+# Module 1, Monte Carlo Simulations
+# Moretz, Brandon
+######################################################
 
 # Suppose a hedge fund owns $1,000,000 of stock and used $50,000 of its own capital and $950,000 in borrowed money for the purchase.
 # Suppose that if the value of the stock falls below $950,000 at the end of any trading day, then the hedge fund will sell all the stock and repay the loan.
@@ -96,6 +99,7 @@ simulate_market <- function(days) {
   cumsum(r) # return the final log price after N days.
 }
 
+# Simulation
 for (i in 1:niter) {
 
   logPrice = initial.investment + simulate_market(45) # simulate 45 trading days.
