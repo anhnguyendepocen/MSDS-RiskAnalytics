@@ -1,17 +1,73 @@
-######################################################
-# Module 1, Monte Carlo Simulations
-# Moretz, Brandon
-######################################################
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(ggrepel)
+library(GGally)
+library(ggthemes)
+library(scales)
+library(reshape2)
+library(skimr)
+library(gridExtra)
 
-# Suppose a hedge fund owns $1,000,000 of stock and used $50,000 of its own capital and $950,000 in borrowed money for the purchase.
-# Suppose that if the value of the stock falls below $950,000 at the end of any trading day, then the hedge fund will sell all the stock and repay the loan.
-# This will wipe out its $50,000 investment.
-# The hedge fund is said to be leveraged 20:1 since its position is 220 times the amount of its own capital invested.
+#####################################################################
+######################### Chapter 2 Lab #############################
+#####################################################################
 
-# Suppose that the daily log returns on the stock have a mean of 0.05/year and a standard deviation of 0.23/year. 
-# These can be converted to rates per trading day by dividing by 253 and sqrt(253), respectively.
+theme_set(theme_sjplot())
 
-# What is the probability that the value of the stock will be below $950,000 at the close of at least one of the next 45 trading days?
+path.data <- "D:/Projects/MSDS-RiskAnalytics/datasets"
+setwd(path.data)
+
+# 2.4.1
+# Data Analytics
+
+dat <- read.csv("Stock_bond.csv", header = T)
+
+names(dat)
+attach(dat)
+
+par(mfrow = c(1, 2))
+
+plot(GM_AC, type = "l")
+plot(F_AC, type = "l")
+
+n <- dim(dat)[1]
+GMReturn <- GM_AC[-1] / GM_AC[-n] - 1
+FReturn <- F_AC[-1] / F_AC[-n] - 1
+
+par(mfrow = c(1, 1))
+plot(GMReturn, FReturn)
+
+# Problems
+
+# 1.)
+# Do GM and Ford returns seem positively correlated? Do you notice any outliying returns? 
+
+cor(GMReturn, FReturn) # .61
+
+# If "yes," do outlying GM returns seem to occur with outliying Ford returns?
+
+logGMReturn <- diff(log(GM_AC))
+
+plot(GMReturn, logGMReturn)
+cor(GMReturn, logGMReturn)
+
+# MSFT / MRK
+
+MSReturn <- MSFT_AC[-1] / MSFT_AC[-n] - 1
+logMSReturn <- diff(log(MSFT_AC))
+
+MRKReturn <- MRK_AC[-1] / MRK_AC[-n] - 1
+logMRKReturn <- diff(log(MRK_AC))
+
+plot(MSReturn, MRKReturn)
+
+cor(MSReturn, MRKReturn)
+
+plot(MSReturn, logMSReturn)
+
+# 2.4.2
+# Simulations
 
 niter <- 1e5 # number of iterations
 set.seed(2009) # reproducible
@@ -100,7 +156,47 @@ print(paste0("Expected profit/loss assuming stop limits of $100,000 and -50,000:
 ev.pnl <- mean(outcomes$pnl) # Expected P&L
 print(paste0("Expected profit/loss with market orders: $", round(ev.pnl, 2)))
 
-ev.ret <- mean(outcomes$ret) # Expected Return (TW)
-print(paste0("Expected (time-weighted) return of the hedge fund (strategy): ", round(ev.ret, 3) * 100, "%"))
+strat.returns <- (ifelse(outcomes$pnl < 0, - seed.capital, outcomes$pnl) / seed.capital) / outcomes$open
+ev.ret <- mean(strat.returns) # Expected Return (TW)
+print(paste0("Expected (time-weighted) return of the hedge fund (strategy): ", round(ev.ret, 5) * 100, "%"))
 
-strat.returns <- (ifelse(outcomes$pnl < 0, - seed.capital, outcomes$pnl) / seed.capital) /
+# 2.4.3
+# Simulating Geometric Random Walk
+
+set.seed(2012)
+n = 253
+par(mfrow = c(3, 3))
+for (i in (1:9)) {
+  logr = rnorm(n, 0.05 / 253, 0.2 / sqrt(253))
+  price = c(120, 120 * exp(cumsum(logr)))
+  plot(price, type = "b")
+}
+
+# What are the mean & sd of the log-returns for 1 year?
+
+mean(logr) * 100
+sd(logr)
+
+# 2.4.4
+# McDonald's Stock
+
+par(mfrow = c(1, 1))
+
+data <- read.csv("MCD_PriceDaily.csv", header = T)
+head(data)
+adjPrice <- data[, 7]
+
+n <- length(adjPrice)
+
+rets <- adjPrice[2:n] / adjPrice[1:(n - 1)] - 1
+lrets <- log(adjPrice[2:n] / adjPrice[1:(n - 1)])
+
+plot(rets, lrets, type = 'p', xlab = 'return', ylab = 'log return')
+grid()
+print(cor(rets, lrets))
+
+print(sprintf('returns: mean= %f; std= %f', mean(rets), sd(rets)))
+print(sprintf('log-returns: mean= %f; std= %f', mean(lrets), sd(lrets)))
+
+t.test(x = rets, y = lrets, paired = TRUE)
+
