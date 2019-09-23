@@ -57,7 +57,7 @@ outcomes <- list(above = rep(0, niter),
                  below = rep(0, niter),
                  middle = rep(0, niter),
                  pnl = rep(0, niter),
-                 ret = rep(0, niter))
+                 open = rep(0, niter))
 
 for (i in 1:niter) {
 
@@ -79,7 +79,7 @@ for (i in 1:niter) {
 
   # p&l = ending value - initial investment
   outcomes$pnl[i] <- exp(logPrice[daysOpen]) - exp(initial.investment)
-  outcomes$ret[i] <- ( outcomes$pnl[i] / seed.capital ) / daysOpen
+  outcomes$open[i] <- daysOpen
 }
 
 stopifnot(sum(outcomes$above) + sum(outcomes$below) + sum(outcomes$middle) == niter)
@@ -102,3 +102,5 @@ print(paste0("Expected profit/loss with market orders: $", round(ev.pnl, 2)))
 
 ev.ret <- mean(outcomes$ret) # Expected Return (TW)
 print(paste0("Expected (time-weighted) return of the hedge fund (strategy): ", round(ev.ret, 3) * 100, "%"))
+
+strat.returns <- (ifelse(outcomes$pnl < 0, - seed.capital, outcomes$pnl) / seed.capital) /
