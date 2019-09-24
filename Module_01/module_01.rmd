@@ -29,7 +29,7 @@ header-includes:
    \setlength\headheight{30pt}
    \rhead{\color{headergrey}\today} 
    \fancyhead[L]{\color{headergrey}Moretz, Brandon}
-   \fancyhead[C]{\Huge\bfseries\color{headergrey}Financial and Risk Analytics}
+   \fancyhead[C]{\Large\bfseries\color{headergrey}MSDS 451 - Financial and Risk Analytics}
    \rfoot{}
    \fancyfoot[C]{\rmfamily\color{headergrey} Highly Confidential}
 geometry: left = 1cm, right = 1cm, top = 2cm, bottom = 3cm
@@ -119,7 +119,8 @@ These can be converted to rates per trading day by dividing by 253 and sqrt(253)
 
 ```{r, global_env, echo = T}
 
-niter <- 1e5 # number of iterations
+# number of iterations in the sim.
+niter <- 1e5
 
 seed.capital <- 5e4
 initial.investment <- log(1e6)
@@ -128,14 +129,18 @@ profit.threshold <- log(1.1e6)
 loss.threshold <- log(9.5e5)
 target.profit <- 1e5
 
+ret.avg <- 0.05
+ret.sd <- 0.23
+market.open <- 253
+
 simulate_market <- function(days) {
   # generate random returns for N days
-  r <- rnorm(days, mean = 0.05 / 253,
-            sd = 0.23 / sqrt(253))
+  r <- rnorm(days, mean = ret.avg / market.open,
+            sd = ret.sd / sqrt(market.open))
 
-  cumsum(r) # return the final log price after N days.
+  # return the final log price after N days.
+  cumsum(r)
 }
-
 
 ```
 
@@ -146,7 +151,8 @@ simulate_market <- function(days) {
 
 ```{r, sim1, echo = T}
 
-set.seed(2009) # reproducible
+# reproducible
+set.seed(2009)
 
 # setup storage
 outcomes <- list(below = rep(0, niter))
@@ -154,9 +160,11 @@ outcomes <- list(below = rep(0, niter))
 # Simulation: Probability dips below $950,000.
 for (i in 1:niter) {
 
-  logPrice = initial.investment + simulate_market(45) # simulate 45 trading days.
+  # simulate 45 trading days.
+  logPrice = initial.investment + simulate_market(45)
 
-  minlogP = min(logPrice) # miniumum price over next 45 days
+  # miniumum price over next 45 days
+  minlogP = min(logPrice)
 
   outcomes$below[i] = as.numeric(minlogP < loss.threshold)
 }
@@ -183,17 +191,19 @@ Suppose the hedge fund will:
 
 ```{r, sim2, echo = T}
 
-set.seed(2009) # reproducible
+# reproducible
+set.seed(2009)
 
 outcomes <- list(above = rep(0, niter),
                  below = rep(0, niter),
                  middle = rep(0, niter),
                  pnl = rep(0, niter),
-                 open = rep(0, niter))
+                 ret = rep(0, niter))
 
 for (i in 1:niter) {
 
-  logPrice = initial.investment + simulate_market(100) # simulate 100 trading days.
+  # simulate 100 trading days.
+  logPrice = initial.investment + simulate_market(100)
 
   suppressWarnings({
     # ignore Inf returned if condition not meet.
@@ -201,19 +211,27 @@ for (i in 1:niter) {
     loss.day <- min(which(logPrice <= loss.threshold))
   })
 
+  is.market <- profit.day == Inf && loss.day == Inf
+
   # What was the exit condition of the position, hince the final price of the stock?
-  daysOpen <- ifelse(profit.day == Inf && loss.day == Inf, length(logPrice),
+  daysOpen <- ifelse(is.market, length(logPrice),
                        min(profit.day, loss.day))
 
   outcomes$above[i] <- min(profit.day) < min(loss.day)
-  outcomes$middle[i] <- profit.day == Inf && loss.day == Inf
+  outcomes$middle[i] <- is.market
   outcomes$below[i] <- min(loss.day) < min(profit.day)
 
   # p&l = ending value - initial investment
-  outcomes$pnl[i] <- exp(logPrice[daysOpen]) - exp(initial.investment)
-  outcomes$open[i] <- daysOpen
+  pnl <- exp(logPrice[daysOpen]) - exp(initial.investment)
+
+  outcomes$pnl[i] <- ifelse(is.market, pnl,
+                            ifelse(pnl >= 0, target.profit, - seed.capital))
+
+  # Calculate return (time-weighted)
+  outcomes$ret[i] <- (outcomes$pnl[i] / seed.capital) / daysOpen
 }
 
+# Verify we captured every simulation outcome.
 stopifnot(sum(outcomes$above) + sum(outcomes$below) + sum(outcomes$middle) == niter)
 
 ```
@@ -251,36 +269,15 @@ _Probability the hedge fund (strategy) returns a loss:_ __`r p6`%__
 ### Problem 7
 ######  What is the expected profit from this trading strategy?
 
-```{r, prob7a, echo = T}
+```{r, prob7, echo = T}
 
-# floating pnl
-floating.pnl <- sum(outcomes$pnl[outcomes$middle == 1])
-
-# expected pnl if we assume:
-# above close = $100,000, 
-# below close = -50,000, 
-# and middle = sell at market price.
-
-avg.pnl <- (sum(outcomes$above) * 100000 +
-   sum(outcomes$below) * -50000 +
-   floating.pnl) / length(outcomes$pnl)
-
-p7a <- round(mean(avg.pnl), 3)
+# Expected P&L
+ev.pnl <- mean(outcomes$pnl)
+p7 <- round(ev.pnl, 2)
 
 ```
 
-_Expected profit/loss assuming stop limits of $100,000 and -50,000:_ __$`r p7a`__
-
-
-```{r, prob7b, echo = T}
-
-# Using only market prices and actual pnl.
-ev.pnl <- mean(outcomes$pnl) # Expected P&L
-p7b <- round(ev.pnl, 2)
-
-```
-
-_Expected profit/loss with market orders:_ __$`r p7b`__
+_Expected profit/loss of the hedge fund (strategy):_ __$`r p7`__
 
 ### Problem 8
 ######  What is the expected return?
@@ -288,9 +285,7 @@ _Expected profit/loss with market orders:_ __$`r p7b`__
 ```{r, prob8, echo = T}
 
 # Expected Return (TW)
-strat.returns <- (ifelse(outcomes$pnl < 0,
-    -seed.capital, outcomes$pnl) / seed.capital) / outcomes$open
-p8 <- round(mean(strat.returns), 5) * 100
+p8 <- round(mean(outcomes$ret), 5) * 100
 
 ```
 
