@@ -50,18 +50,19 @@ print(paste0("Probability the value of the stock is below $950,000 at least one 
 # Suppose the hedge fund will sell the stock for a profit of at least $100,000 if the value of the stock rises to at least 
 # $1,100,000 at the end of one of the first 100 trading days, sell it for a sloss if the value falls below $950,000 at the end of
 # one of the first 100 trading days, or sell it (for "FMV") after 100 trading days if the closing price has stayed between $950,000 and $1,100,000.
-
-set.seed(2009) # reproducible
+# reproducible
+set.seed(2009)
 
 outcomes <- list(above = rep(0, niter),
                  below = rep(0, niter),
                  middle = rep(0, niter),
                  pnl = rep(0, niter),
-                 open = rep(0, niter))
+                 ret = rep(0, niter))
 
 for (i in 1:niter) {
 
-  logPrice = initial.investment + simulate_market(100) # simulate 100 trading days.
+  # simulate 100 trading days.
+  logPrice = initial.investment + simulate_market(100)
 
   suppressWarnings({
     # ignore Inf returned if condition not meet.
@@ -69,37 +70,38 @@ for (i in 1:niter) {
     loss.day <- min(which(logPrice <= loss.threshold))
   })
 
+  is.market <- profit.day == Inf && loss.day == Inf
+
   # What was the exit condition of the position, hince the final price of the stock?
-  daysOpen <- ifelse(profit.day == Inf && loss.day == Inf, length(logPrice),
+  days.open <- ifelse(is.market, length(logPrice),
                        min(profit.day, loss.day))
 
   outcomes$above[i] <- min(profit.day) < min(loss.day)
-  outcomes$middle[i] <- profit.day == Inf && loss.day == Inf
+  outcomes$middle[i] <- is.market
   outcomes$below[i] <- min(loss.day) < min(profit.day)
 
   # p&l = ending value - initial investment
-  outcomes$pnl[i] <- exp(logPrice[daysOpen]) - exp(initial.investment)
-  outcomes$open[i] <- daysOpen
+  pnl <- exp(logPrice[days.open]) - exp(initial.investment)
+
+  # market pnl = use FMV, otherwise cap p/l
+  outcomes$pnl[i] <- ifelse(is.market, pnl,
+                            ifelse(pnl >= 0, target.profit, - seed.capital))
+
+  # Calculate return (time-weighted)
+  outcomes$ret[i] <- (outcomes$pnl[i] / seed.capital) / days.open
 }
 
+# Verify we captured every simulation outcome.
 stopifnot(sum(outcomes$above) + sum(outcomes$below) + sum(outcomes$middle) == niter)
 
-prob.profit.target <- sum(outcomes$pnl >= target.profit) / length(outcomes$pnl) # Probability of profit over $100,000.
-print(paste0("Probability the hedge fund (strategy) returns over $100,000 in profit: ", round(mean(prob.profit.target), 3) * 100, "%"))
+prob.profit <- sum(outcomes$above) / length(outcomes$pnl)
+print(paste0("Probability the hedge fund (strategy) returns over $100,000 in profit: ", round(mean(prob.profit), 3) * 100, "%"))
 
-prob.loss <- sum(outcomes$below) / length(outcomes$below) # Probability of loss
+prob.loss <- sum(outcomes$below) / length(outcomes$below)
 print(paste0("Probability the hedge fund (strategy) returns a loss: ", round(mean(prob.loss), 3) * 100, "%"))
 
-# floating pnl
-floating.pnl <- sum(outcomes$pnl[outcomes$middle == 1])
-# expected pnl if we assume above close = $100,000, below close = -50,000 and middle = sell at market price.
-avg.pnl <- (sum(outcomes$above) * 100000 + sum(outcomes$below) * -50000 + floating.pnl) / length(outcomes$pnl)
-print(paste0("Expected profit/loss assuming stop limits of $100,000 and -50,000: $", round(mean(avg.pnl), 3)))
+ev.pnl <- mean(outcomes$pnl)
+print(paste0("Expected profit/loss of the hedge fund (strategy): $", round(ev.pnl, 2)))
 
-# Using only market prices and actual pnl.
-ev.pnl <- mean(outcomes$pnl) # Expected P&L
-print(paste0("Expected profit/loss with market orders: $", round(ev.pnl, 2)))
-
-strat.returns <- (ifelse(outcomes$pnl < 0, - seed.capital, outcomes$pnl) / seed.capital) / outcomes$open
-ev.ret <- mean(strat.returns) # Expected Return (TW)
+ev.ret <- mean(outcomes$ret)
 print(paste0("Expected (time-weighted) return of the hedge fund (strategy): ", round(ev.ret, 5) * 100, "%"))

@@ -27,11 +27,12 @@ header-includes:
    \definecolor{msdblue}{HTML}{1C93D1}
    \pagestyle{fancy}
    \setlength\headheight{30pt}
-   \rhead{\color{headergrey}\today} 
+   \rhead{\color{headergrey}\today}
    \fancyhead[L]{\color{headergrey}Moretz, Brandon}
-   \fancyhead[C]{\Large\bfseries\color{headergrey}MSDS 451 - Financial and Risk Analytics}
-   \rfoot{}
-   \fancyfoot[C]{\rmfamily\color{headergrey} Highly Confidential}
+   \fancyhead[C]{\Large\bfseries\color{headergrey}Monte Carlo Simulations}
+   \rfoot{\color{headergrey}Module 1}
+   \lfoot{\color{headergrey}MSDS 451}
+   \fancyfoot[C]{\rmfamily\color{headergrey}Financial and Risk Analytics}
 geometry: left = 1cm, right = 1cm, top = 2cm, bottom = 3cm
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
@@ -98,9 +99,6 @@ panderOptions('big.mark', ",")
 panderOptions('keep.trailing.zeros', TRUE)
 
 ```
-
-## Module 1
-### Monte Carlo Simulations
 
 #### Problem Background:
 
