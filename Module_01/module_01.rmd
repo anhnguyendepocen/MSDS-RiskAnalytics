@@ -214,7 +214,7 @@ for (i in 1:niter) {
   is.market <- profit.day == Inf && loss.day == Inf
 
   # What was the exit condition of the position, hince the final price of the stock?
-  daysOpen <- ifelse(is.market, length(logPrice),
+  days.open <- ifelse(is.market, length(logPrice),
                        min(profit.day, loss.day))
 
   outcomes$above[i] <- min(profit.day) < min(loss.day)
@@ -222,13 +222,14 @@ for (i in 1:niter) {
   outcomes$below[i] <- min(loss.day) < min(profit.day)
 
   # p&l = ending value - initial investment
-  pnl <- exp(logPrice[daysOpen]) - exp(initial.investment)
+  pnl <- exp(logPrice[days.open]) - exp(initial.investment)
 
+  # market pnl = use FMV, otherwise cap p/l
   outcomes$pnl[i] <- ifelse(is.market, pnl,
                             ifelse(pnl >= 0, target.profit, - seed.capital))
 
   # Calculate return (time-weighted)
-  outcomes$ret[i] <- (outcomes$pnl[i] / seed.capital) / daysOpen
+  outcomes$ret[i] <- (outcomes$pnl[i] / seed.capital) / days.open
 }
 
 # Verify we captured every simulation outcome.
@@ -243,10 +244,9 @@ stopifnot(sum(outcomes$above) + sum(outcomes$below) + sum(outcomes$middle) == ni
 
 ```{r, prob5, echo = T}
 
-# Probability of profit over $100,000.
-prob.profit.target <- sum(outcomes$pnl >= target.profit) / length(outcomes$pnl)
+prob.profit <- sum(outcomes$above) / length(outcomes$pnl)
 
-p5 <- round(mean(prob.profit.target), 3) * 100
+p5 <- round(mean(prob.profit), 4) * 100
 
 ```
 
@@ -257,10 +257,9 @@ _Probability the hedge fund (strategy) returns over $100,000 in profit:_ __`r p5
 
 ```{r, prob6, echo = T}
 
-# Probability of loss
 prob.loss <- sum(outcomes$below) / length(outcomes$below)
 
-p6 <- round(mean(prob.loss), 3) * 100
+p6 <- round(mean(prob.loss), 4) * 100
 
 ```
 
@@ -271,20 +270,17 @@ _Probability the hedge fund (strategy) returns a loss:_ __`r p6`%__
 
 ```{r, prob7, echo = T}
 
-# Expected P&L
-ev.pnl <- mean(outcomes$pnl)
-p7 <- round(ev.pnl, 2)
+p7 <- currency(mean(outcomes$pnl))
 
 ```
 
-_Expected profit/loss of the hedge fund (strategy):_ __$`r p7`__
+_Expected profit/loss of the hedge fund (strategy):_ __`r p7`__
 
 ### Problem 8
 ######  What is the expected return?
 
 ```{r, prob8, echo = T}
 
-# Expected Return (TW)
 p8 <- round(mean(outcomes$ret), 5) * 100
 
 ```
