@@ -1,0 +1,6 @@
+install.packages("quantmod")
+install.packages("purrr")
+install.packages("tidyverse")
+install.packages("timetk")
+install.packages("chron")
+install.packages("tidyquant")
