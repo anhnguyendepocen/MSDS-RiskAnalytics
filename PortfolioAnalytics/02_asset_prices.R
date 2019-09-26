@@ -54,6 +54,8 @@ prices_monthly <- to.monthly(prices,
 
 head(prices_monthly)
 
+# Convert to monthly returns, xts.
+
 asset_returns_xts <-
   Return.calculate(prices_monthly,
                    method = "log") %>%
