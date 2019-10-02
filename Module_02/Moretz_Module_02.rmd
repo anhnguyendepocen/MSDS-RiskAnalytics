@@ -29,8 +29,8 @@ header-includes:
    \setlength\headheight{30pt}
    \rhead{\color{headergrey}\today}
    \fancyhead[L]{\color{headergrey}Moretz, Brandon}
-   \fancyhead[C]{\Large\bfseries\color{headergrey} TOPIC}
-   \rfoot{\color{headergrey}Module X}
+   \fancyhead[C]{\Large\bfseries\color{headergrey} Stock Returns and Lognormal Distributions}
+   \rfoot{\color{headergrey}Module 2}
    \lfoot{\color{headergrey}MSDS 451}
    \fancyfoot[C]{\rmfamily\color{headergrey}Financial and Risk Analytics}
 geometry: left = 1cm, right = 1cm, top = 2cm, bottom = 3cm
@@ -100,187 +100,167 @@ panderOptions('keep.trailing.zeros', TRUE)
 
 ```
 
-#### Problem Background:
+### Problem 1
+######  Assume that a stock's log returns at any time scale have normal distribution. 
 
-+ Suppose a hedge fund owns __$1,000,000__ of stock and used _$50,000_ of its own capital and _$950,000_ in borrowed money for the purchase.
++ Suppose that its average annual log return is 100%, and its annual standard deviation ("volatility") of log returns is 200%. 
 
-+ Suppose that if the value of the stock falls below _$950,000_ at the end of any trading day, then the hedge fund will sell all the stock and repay the loan.
-+ This will wipe out its $50,000 investment.
+What are its average (mu) and standard deviation (sigma) of daily log returns, assuming a year has 250 trading days? 
 
-The hedge fund is said to be leveraged __20:1__ since its position is _220_ times the amount of its own capital invested.
+```{r, prob1, echo = T}
 
-+ Suppose that the daily log returns on the stock have a mean of __0.05__/year and a standard deviation of __0.23__/year. 
+trading.days <- 250
 
-These can be converted to rates per trading day by dividing by 253 and sqrt(253), respectively.
+annual.ret <- 1
+annual.vol <- 2
 
-##### Initialization
+mu <- annual.ret / trading.days
+sigma <- annual.vol / sqrt(trading.days)
 
-```{r, global_env, echo = T}
-
-# number of iterations in the sim.
-niter <- 1e5
-
-seed.capital <- 5e4
-initial.investment <- log(1e6)
-
-profit.threshold <- log(1.1e6)
-loss.threshold <- log(9.5e5)
-target.profit <- 1e5
-
-ret.avg <- 0.05
-ret.sd <- 0.23
-market.open <- 253
-
-simulate_market <- function(days) {
-  # generate random returns for N days
-  r <- rnorm(days, mean = ret.avg / market.open,
-            sd = ret.sd / sqrt(market.open))
-
-  # return the final log price after N days.
-  cumsum(r)
-}
+prob1 <- list(mu = round(mu, 5), sigma = round(sigma, 5))
 
 ```
 
-\newpage
+_Average:_ __`r prob1$mu`__
+
+_Standard Deviation:_ __`r prob1$sigma`__
+
+### Problem 2
+######  Simulate 250 instances of the daily log returns described in 1.) with random seed __set.seed(2015)__. 
+
++ Compute the net returns of these instances, and compute their average and standard deviation.
+
+```{r, prob2, echo = T}
+
+set.seed(2015)
+
+logRet <- rnorm(250, mu, sigma)
+netRet <- exp(logRet) - 1
+
+m <- round(mean(netRet), 5)
+s <- round(sd(netRet), 5)
+  
+```
+
+
+_Average Net Return:_ __`r format(m, scientific = F)`__
+
+_Standard Deviation of Net Returns:_ __`r format(s, scientific = F)`__
+
+_Are the average (m) and standard deviation (s) of net returns same as the average and standard deviation of log returns computed in 1.)?_
+
+__Answer:__ While not identical, they are close enough for practical purposes.
+
+```{r, prob2_logret, echo = F}
+
+p1 <- ggplot(data.table(ret = logRet), aes(ret)) +
+  geom_histogram(aes(fill = ..count..), bins = 25) +
+  ggtitle("Log Returns Distribution") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+p2 <- ggplot(data.table(ret = netRet), aes(ret)) +
+  geom_histogram(aes(fill = ..count..), bins = 25) +
+  ggtitle("Net Returns Distribution") +
+  theme(plot.title = element_text(hjust = 0.5))
+  
+grid.arrange(p1, p2, nrow = 2)
+
+```
+
+### Problem 3
+
++ Compute the quantity $m-\frac{s^2}{2}$.
+
+```{r, prob3_a, echo = T}
+
+prob3.a <- round(m - s^2/2, 5)
+
+```
+
++ $m-\frac{s^2}{2}$ = __$`r format(prob3.a, scientific = F)`$__
+
+_How does this compare with the average log return mu computed in part 1.)?_
+
+__Answer:__ This is a close approximation to the original value of mu. We should note the extremely small sample size (250), and that a larger sample size (2.5m) produces a closer approximation:
+
+```{r, prob3_b, echo = T}
+
+set.seed(2015)
+
+logRet <- rnorm(2500000, mu, sigma)
+netRet <- exp(logRet) - 1
+
+prob3.b <- round(mean(netRet) - sd(netRet)^2/2, 5)
+
+```
+
+__2.5m samples = $`r prob3.b`$__
+
+Their equality can be proven analytically through a mathematical theorem called Ito's Lemma that lies at the foundation of Black-Scholes options pricing formula. 
+Their numerical equality is not that good here because Ito's Lemma assumes we can divide a period into infinitesimally small sub-periods. 
+
+So divide a year into 25,000 sub-periods (think of these sub-periods roughly as minutes) instead, and compare the new mu (average log return per minute) with the new $m-\frac{s^2}{2}$ (m is now the average net return per minute). 
+
+```{r, prob3_c, echo = T}
+
+set.seed(2015)
+
+trading.periods <- 25e3
+
+min_from_days <- function(days) {
+  60 * 6.5 * days
+}
+
+new.mu <- annual.ret / trading.periods
+new.sigma <- annual.vol / sqrt(trading.periods)
+
+min.logRet <- rnorm( min_from_days(250), new.mu, new.sigma)
+min.netRet <- exp(min.logRet) - 1
+
+new.m <- mean(min.netRet)
+new.s <- sd(min.netRet)
+
+prob3.c <- round(new.m - new.s^2/2, 5)
+
+```
+
++ New m = $`r format(round(new.m, 5 ), scientific=F)`$
++ New $m-\frac{s^2}{2}$ = $`r format(prob3.c, 5, scientific=F)`$
+
+Also, compare the new sigma (standard deviation of log returns per minute) with the new s (standard deviation of net return per minute).
+
++ New sigma: __`r round(new.sigma, 5)`__
++ New s: __`r round(new.s, 5)`__
 
 ### Problem 4
-######  What is the probability that the value of the stock will be below $950,000 at the close of at least one of the next 45 trading days?
 
-```{r, sim1, echo = T}
+If we assume that the stock's initial price is $1, what is the expected value of its log price log(P(t)) after t minutes expressed in terms of mu?
+.
 
-# reproducible
-set.seed(2009)
+```{r, prob4_c, echo = T}
 
-# setup storage
-outcomes <- list(below = rep(0, niter))
+set.seed(2015)
 
-# Simulation: Probability dips below $950,000.
-for (i in 1:niter) {
+initial.price <- 1
 
-  # simulate 45 trading days.
-  logPrice = initial.investment + simulate_market(45)
+t <- 250
 
-  # miniumum price over next 45 days
-  minlogP = min(logPrice)
+logRet = rnorm( min_from_days(t), new.mu, new.sigma) 
+logPrice = c(initial.price, initial.price * cumsum(logRet))
 
-  outcomes$below[i] = as.numeric(minlogP < loss.threshold)
-}
+ggplot(data.table(y = logPrice)[, x := .I], aes( x, y)) +
+  geom_line(color = "cornflowerblue") +
+  labs(title = "Log Stock Price After t", x = "Time", y = "Log Price") +
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
-```{r, prob4, echo = F}
+And what is the expected value of its price P(t) expressed in terms of mu and sigma? 
 
-p4 <- round(mean(outcomes$below), 4) * 100
-
-```
-
-_Probability the value of the stock is below $950,000 at least one of next 45 sessions:_ __`r p4`%__
-
-\newpage
-
-Suppose the hedge fund will:
-
-+ sell the stock for a profit of at least __$100,000__ if the value of the stock rises to at least __$1,100,000__ at the end of one of the first _100_ trading days,
-
-+ sell it for a loss if the value falls below __$950,000__ at the end of one of the first _100_ trading days, 
-
-+ or sell it (for "FMV") after _100_ trading days if the closing price has stayed between _$950,000_ and _$1,100,000_.
-
-```{r, sim2, echo = T}
-
-# reproducible
-set.seed(2009)
-
-outcomes <- list(above = rep(0, niter),
-                 below = rep(0, niter),
-                 middle = rep(0, niter),
-                 pnl = rep(0, niter),
-                 ret = rep(0, niter))
-
-for (i in 1:niter) {
-
-  # simulate 100 trading days.
-  logPrice = initial.investment + simulate_market(100)
-
-  suppressWarnings({
-    # ignore Inf returned if condition not meet.
-    profit.day <- min(which(logPrice >= profit.threshold))
-    loss.day <- min(which(logPrice <= loss.threshold))
-  })
-
-  is.market <- profit.day == Inf && loss.day == Inf
-
-  # What was the exit condition of the position, hince the final price of the stock?
-  days.open <- ifelse(is.market, length(logPrice),
-                       min(profit.day, loss.day))
-
-  outcomes$above[i] <- min(profit.day) < min(loss.day)
-  outcomes$middle[i] <- is.market
-  outcomes$below[i] <- min(loss.day) < min(profit.day)
-
-  # p&l = ending value - initial investment
-  pnl <- exp(logPrice[days.open]) - exp(initial.investment)
-
-  # market pnl = use FMV, otherwise cap p/l
-  outcomes$pnl[i] <- ifelse(is.market, pnl,
-                            ifelse(pnl >= 0, target.profit, - seed.capital))
-
-  # Calculate return (time-weighted)
-  outcomes$ret[i] <- (outcomes$pnl[i] / seed.capital) / days.open
-}
-
-# Verify we captured every simulation outcome.
-stopifnot(sum(outcomes$above) + sum(outcomes$below) + sum(outcomes$middle) == niter)
-
-```
-
-\newpage
+Finally, express these expected values in terms of m and s instead.
 
 ### Problem 5
-######  What is the probability that the hedge fund (strategy) will make a profit of at least _$100,000_?
 
-```{r, prob5, echo = T}
+The continuously compounded rate of growth of a stock is log(P(t))/t. 
 
-prob.profit <- sum(outcomes$above) / length(outcomes$pnl)
-
-p5 <- round(mean(prob.profit), 4) * 100
-
-```
-
-_Probability the hedge fund (strategy) returns over $100,000 in profit:_ __`r p5`%__
-
-### Problem 6
-######  What is the probability that the hedge fund (strategy) will suffer a loss?
-
-```{r, prob6, echo = T}
-
-prob.loss <- sum(outcomes$below) / length(outcomes$below)
-
-p6 <- round(mean(prob.loss), 4) * 100
-
-```
-
-_Probability the hedge fund (strategy) returns a loss:_ __`r p6`%__
-
-### Problem 7
-######  What is the expected profit from this trading strategy?
-
-```{r, prob7, echo = T}
-
-p7 <- currency(mean(outcomes$pnl))
-
-```
-
-_Expected profit/loss of the hedge fund (strategy):_ __`r p7`__
-
-### Problem 8
-######  What is the expected return?
-
-```{r, prob8, echo = T}
-
-p8 <- round(mean(outcomes$ret), 5) * 100
-
-```
-
-_Expected (time-weighted) return of the hedge fund (strategy):_ __`r p8`%__
++ What is the expected continuously compounded rate of growth of the stock in part __4__?

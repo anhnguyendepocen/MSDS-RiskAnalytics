@@ -57,6 +57,7 @@ outcomes <- list(above = rep(0, niter),
                  below = rep(0, niter),
                  middle = rep(0, niter),
                  pnl = rep(0, niter),
+                 capped_pnl = rep(0, niter),
                  ret = rep(0, niter))
 
 for (i in 1:niter) {
@@ -84,8 +85,10 @@ for (i in 1:niter) {
   pnl <- exp(logPrice[days.open]) - exp(initial.investment)
 
   # market pnl = use FMV, otherwise cap p/l
-  outcomes$pnl[i] <- ifelse(is.market, pnl,
-                            ifelse(pnl >= 0, target.profit, - seed.capital))
+  outcomes$pnl[i] <- pnl
+  
+  outcomes$capped_pnl[i] <- ifelse(is.market, pnl, 
+                                ifelse(pnl > 0, target.profit, -seed.capital))
 
   # Calculate return (time-weighted)
   outcomes$ret[i] <- (outcomes$pnl[i] / seed.capital) / days.open
@@ -93,6 +96,9 @@ for (i in 1:niter) {
 
 # Verify we captured every simulation outcome.
 stopifnot(sum(outcomes$above) + sum(outcomes$below) + sum(outcomes$middle) == niter)
+
+mean(outcomes$pnl) # 8910.54
+mean(outcomes$capped_pnl) # 9922.63
 
 prob.profit <- sum(outcomes$above) / length(outcomes$pnl)
 print(paste0("Probability the hedge fund (strategy) returns over $100,000 in profit: ", round(mean(prob.profit), 3) * 100, "%"))

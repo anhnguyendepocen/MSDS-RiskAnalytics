@@ -223,8 +223,7 @@ for (i in 1:niter) {
   pnl <- exp(logPrice[days.open]) - exp(initial.investment)
 
   # market pnl = use FMV, otherwise cap p/l
-  outcomes$pnl[i] <- ifelse(is.market, pnl,
-                            ifelse(pnl >= 0, target.profit, - seed.capital))
+  outcomes$pnl[i] <- pnl
 
   # Calculate return (time-weighted)
   outcomes$ret[i] <- (outcomes$pnl[i] / seed.capital) / days.open
