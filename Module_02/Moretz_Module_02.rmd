@@ -86,7 +86,14 @@ pretty_kable <- function(data, title, dig = 2) {
     kable_styling(bootstrap_options = c("striped", "hover"))
 }
 
-theme_set(theme_gdocs())
+theme_set(theme_light())
+
+# Theme Overrides
+theme_update(plot.title = element_text(hjust = 0.5),
+             axis.text.x = element_text(size = 10),
+             axis.text.y = element_text(size = 10),
+             axis.title = element_text(face = "bold", size = 12, colour = "steelblue4"),
+             legend.position = "top", legend.title = element_blank())
 
 ```
 
@@ -199,7 +206,7 @@ __2.5m samples = $`r prob3.b`$__
 Their equality can be proven analytically through a mathematical theorem called Ito's Lemma that lies at the foundation of Black-Scholes options pricing formula. 
 Their numerical equality is not that good here because Ito's Lemma assumes we can divide a period into infinitesimally small sub-periods. 
 
-So divide a year into 25,000 sub-periods (think of these sub-periods roughly as minutes) instead, and compare the new mu (average log return per minute) with the new $m-\frac{s^2}{2}$ (m is now the average net return per minute). 
+So divide a year into 25,000 sub-periods (think of these sub-periods roughly as minutes) instead.
 
 ```{r, prob3_c, echo = T}
 
@@ -211,20 +218,25 @@ min_from_days <- function(days) {
   60 * 6.5 * days
 }
 
-new.mu <- annual.ret / trading.periods
-new.sigma <- annual.vol / sqrt(trading.periods)
+min.avg <- annual.ret / trading.periods
+min.sd <- annual.vol / sqrt(trading.periods)
 
-min.logRet <- rnorm( min_from_days(250), new.mu, new.sigma)
+min.logRet <- rnorm( min_from_days(250), min.avg, min.sd)
 min.netRet <- exp(min.logRet) - 1
 
 new.m <- mean(min.netRet)
 new.s <- sd(min.netRet)
 
+new.mu <- mean(min.logRet)
+new.sigma <- sd(min.logRet)
+
 prob3.c <- round(new.m - new.s^2/2, 5)
 
 ```
 
-+ New m = $`r format(round(new.m, 5 ), scientific=F)`$
+Compare the new mu (average log return per minute) with the new $m-\frac{s^2}{2}$ (m is now the average net return per minute). 
+
++ New mu = $`r format(round(new.mu, 5 ), scientific=F)`$
 + New $m-\frac{s^2}{2}$ = $`r format(prob3.c, 5, scientific=F)`$
 
 Also, compare the new sigma (standard deviation of log returns per minute) with the new s (standard deviation of net return per minute).
@@ -232,10 +244,60 @@ Also, compare the new sigma (standard deviation of log returns per minute) with 
 + New sigma: __`r round(new.sigma, 5)`__
 + New s: __`r round(new.s, 5)`__
 
+\newpage
+
 ### Problem 4
 
-If we assume that the stock's initial price is $1, what is the expected value of its log price log(P(t)) after t minutes expressed in terms of mu?
-.
++ If we assume that the stock's initial price is $1, what is the expected value of its log price log(P(t)) after t minutes expressed in terms of *mu*?
+
+From A9.4 we know that if P is lognormal($\mu$, $\sigma$), then $\mu$ is the expected value of log(P). Sampling for t periods, we have:
+
+\begin{center}
+
+$log(\overline{P}) \sim {\sf N}(\mu, \frac{\sigma^{2}}{t})$
+
+Let $R \sim {\sf N}(\mu, \sigma^{2})$, be a return that is IID standard normal.
+
+$\mathbb{E}$$P_t$ = exp($\sigma R_t + \mu$), where ${R_t}$ is IID standard normal.
+
+Taking the log of both sides, we get:
+
+$log(P_t)$ = $\sigma R_t + \mu$
+
+Subtracting $\sigma R_t$ from both sides:
+
+$\mu$ = $log(P_t) - \sigma R_t$
+
+\end{center}
+
++ And what is the expected value of its price P(t) expressed in terms of *mu* and *sigma*? 
+
+\begin{center}
+
+From the previous problem, we have:
+
+$\mu$ = $log(P_t) - \sigma R_t$
+
+Multiply both sides by $\frac{1}{\sigma}$:
+
+$\frac{\mu}{\sigma}$ = $log(P_t) - R_t$
+
+\end{center}
+
++ Finally, express these expected values in terms of m and s instead.
+
+### Problem 5
+
+The continuously compounded rate of growth of a stock is log(P(t))/t. 
+
++ What is the expected continuously compounded rate of growth of the stock in part __4__?
+
+\begin{center}
+
+$$1 * \sum_{n=1}^{t} log(\frac{P_{n}}{P_{n-1}})$$
+
+\end{center}
+
 
 ```{r, prob4_c, echo = T}
 
@@ -250,17 +312,7 @@ logPrice = c(initial.price, initial.price * cumsum(logRet))
 
 ggplot(data.table(y = logPrice)[, x := .I], aes( x, y)) +
   geom_line(color = "cornflowerblue") +
-  labs(title = "Log Stock Price After t", x = "Time", y = "Log Price") +
+  labs(title = "Log Stock Price P(t)", x = "Time", y = "Log Price") +
   theme(plot.title = element_text(hjust = 0.5))
 
 ```
-
-And what is the expected value of its price P(t) expressed in terms of mu and sigma? 
-
-Finally, express these expected values in terms of m and s instead.
-
-### Problem 5
-
-The continuously compounded rate of growth of a stock is log(P(t))/t. 
-
-+ What is the expected continuously compounded rate of growth of the stock in part __4__?
