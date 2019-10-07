@@ -25,8 +25,8 @@ target.profit <- 1e5
 simulate_market <- function(days) {
   # generate random returns for N days
   r <- rnorm(days, mean = 0.05 / 253,
-            sd = 0.23 / sqrt(253))
-
+             sd = 0.23 / sqrt(253))
+  
   cumsum(r) # return the final log price after N days.
 }
 
@@ -35,11 +35,11 @@ outcomes <- list(below = rep(0, niter))
 
 # Simulation: Probability dips below $950,000.
 for (i in 1:niter) {
-
+  
   logPrice = initial.investment + simulate_market(45) # simulate 45 trading days.
-
+  
   minlogP = min(logPrice) # miniumum price over next 45 days
-
+  
   outcomes$below[i] = as.numeric(minlogP < loss.threshold)
 }
 
@@ -61,35 +61,35 @@ outcomes <- list(above = rep(0, niter),
                  ret = rep(0, niter))
 
 for (i in 1:niter) {
-
+  
   # simulate 100 trading days.
   logPrice = initial.investment + simulate_market(100)
-
+  
   suppressWarnings({
     # ignore Inf returned if condition not meet.
     profit.day <- min(which(logPrice >= profit.threshold))
     loss.day <- min(which(logPrice <= loss.threshold))
   })
-
+  
   is.market <- profit.day == Inf && loss.day == Inf
-
+  
   # What was the exit condition of the position, hince the final price of the stock?
   days.open <- ifelse(is.market, length(logPrice),
-                       min(profit.day, loss.day))
-
+                      min(profit.day, loss.day))
+  
   outcomes$above[i] <- min(profit.day) < min(loss.day)
   outcomes$middle[i] <- is.market
   outcomes$below[i] <- min(loss.day) < min(profit.day)
-
+  
   # p&l = ending value - initial investment
   pnl <- exp(logPrice[days.open]) - exp(initial.investment)
-
+  
   # market pnl = use FMV, otherwise cap p/l
   outcomes$pnl[i] <- pnl
   
   outcomes$capped_pnl[i] <- ifelse(is.market, pnl, 
-                                ifelse(pnl > 0, target.profit, -seed.capital))
-
+                                   ifelse(pnl > 0, target.profit, -seed.capital))
+  
   # Calculate return (time-weighted)
   outcomes$ret[i] <- (outcomes$pnl[i] / seed.capital) / days.open
 }

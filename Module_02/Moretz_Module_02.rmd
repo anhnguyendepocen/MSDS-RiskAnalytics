@@ -250,23 +250,46 @@ Also, compare the new sigma (standard deviation of log returns per minute) with 
 
 + If we assume that the stock's initial price is $1, what is the expected value of its log price log(P(t)) after t minutes expressed in terms of *mu*?
 
-From A9.4 we know that if P is lognormal($\mu$, $\sigma$), then $\mu$ is the expected value of log(P). Sampling for t periods, we have:
+__Assuming__:
+\begin{center}
+
+$\mu$ is the average daily log return,
+
+$\sigma$ is the standard deviation of the daily log return
+
+There are $x$ minutes in a day, then 1 day = $x$ minutes and 1 minute = $\frac{1}{x}$ day
+
+\end{center}
+For some minute $i$,
+\begin{center}
+
+$\mathbb{E}(r/minute)$ = $\mathbb{E}(r_i)$ = $\frac{\mu}{\sigma}$
+
+$\mathbb{V}(r/minute)$ = $\mathbb{V}(r_i)$ = $\frac{\sigma^2}{x^2}$
+
+$\mathbb{\sigma}(r/minute)$ = $\frac{\sigma}{x}$
+
+\end{center}
+
+The expected return after $t$ minutes is,
 
 \begin{center}
 
-$log(\overline{P}) \sim {\sf N}(\mu, \frac{\sigma^{2}}{t})$
+$P_0 = 1$
 
-Let $R \sim {\sf N}(\mu, \sigma^{2})$, be a return that is IID standard normal.
+$P_t = P_0( 1 + R_1)$ ... $(1 + R_t)$
 
-$\mathbb{E}$$P_t$ = exp($\sigma R_t + \mu$), where ${R_t}$ is IID standard normal.
+$log(P_t) = (log P_0) + log(1 + R_1) + log( 1 + R_t)$
 
-Taking the log of both sides, we get:
+$P_t = log(P_0) + r_1 + r_2 + r_t$
 
-$log(P_t)$ = $\sigma R_t + \mu$
+Since $log(1) = 0$
 
-Subtracting $\sigma R_t$ from both sides:
+$P_t = \sum_{i=1}^{t}{r_i}$
 
-$\mu$ = $log(P_t) - \sigma R_t$
+$\mathbb{E}(P_t)$ = $\mathbb{E}(\sum_{i=1}^{t}{r_i})$, 
+
+$\mathbb{E}(r_i) = \frac{\mu}{x}$
 
 \end{center}
 
@@ -274,17 +297,19 @@ $\mu$ = $log(P_t) - \sigma R_t$
 
 \begin{center}
 
-From the previous problem, we have:
+$\mathbb{V}(P_t) = \mathbb{V}(\sum_{i=1}^{t}{r_i})) = t\frac{\sigma^2}{x^2}$
 
-$\mu$ = $log(P_t) - \sigma R_t$
-
-Multiply both sides by $\frac{1}{\sigma}$:
-
-$\frac{\mu}{\sigma}$ = $log(P_t) - R_t$
+$\mathbb{E}(P_t) = t\frac{\mu}{x}$
 
 \end{center}
 
 + Finally, express these expected values in terms of m and s instead.
+
+\begin{center}
+
+$\sigma P_t = \frac{\sigma}{x}\sqrt{t}$
+
+\end{center}
 
 ### Problem 5
 
@@ -294,25 +319,10 @@ The continuously compounded rate of growth of a stock is log(P(t))/t.
 
 \begin{center}
 
-$$1 * \sum_{n=1}^{t} log(\frac{P_{n}}{P_{n-1}})$$
+$\frac{P_t}{t} = \sum_{i=1}^{t} \frac{r_i}{t}$
+
+$\mathbb{E}[\frac{P_t}{t}] = \mathbb{E}[\sum_ \frac{r_t}{t}] = t\frac{\frac{\mu}{x}}{t}$
+
+$\mathbb{E}[\frac{P_t}{t}] = \frac{\mu}{x}$
 
 \end{center}
-
-
-```{r, prob4_c, echo = T}
-
-set.seed(2015)
-
-initial.price <- 1
-
-t <- 250
-
-logRet = rnorm( min_from_days(t), new.mu, new.sigma) 
-logPrice = c(initial.price, initial.price * cumsum(logRet))
-
-ggplot(data.table(y = logPrice)[, x := .I], aes( x, y)) +
-  geom_line(color = "cornflowerblue") +
-  labs(title = "Log Stock Price P(t)", x = "Time", y = "Log Price") +
-  theme(plot.title = element_text(hjust = 0.5))
-
-```

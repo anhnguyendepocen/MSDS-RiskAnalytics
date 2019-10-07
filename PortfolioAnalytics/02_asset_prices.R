@@ -59,7 +59,7 @@ head(prices_monthly)
 asset_returns_xts <-
   Return.calculate(prices_monthly,
                    method = "log") %>%
-                   na.omit()
+  na.omit()
 
 head(asset_returns_xts, 3)
 
@@ -95,8 +95,8 @@ asset_returns_tq_builtin <-
   gather(asset, prices, -date) %>%
   group_by(asset) %>%
   tq_transmute(mutate_fun = periodReturn,
-              period = "monthly",
-              type = "log") %>%
+               period = "monthly",
+               type = "log") %>%
   spread(asset, monthly.returns) %>%
   select(date, symbols) %>%
   slice(-1)
@@ -108,7 +108,7 @@ head(asset_returns_tq_builtin)
 asset_returns_tbltime <-
   prices %>%
   tk_tbl(preserve_index = T,
-          rename_index = "date") %>%
+         rename_index = "date") %>%
   # this is the tibbletime function
   as_tbl_time(index = date) %>%
   as_period(period = "monthly",
