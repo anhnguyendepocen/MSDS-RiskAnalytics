@@ -265,6 +265,7 @@ For some minute $i$,
 
 $\mathbb{E}(r/minute)$ = $\mathbb{E}(r_i)$ = $\frac{\mu}{\sigma}$
 
+
 $\mathbb{V}(r/minute)$ = $\mathbb{V}(r_i)$ = $\frac{\sigma^2}{x^2}$
 
 $\mathbb{\sigma}(r/minute)$ = $\frac{\sigma}{x}$
@@ -299,7 +300,7 @@ $\mathbb{E}(r_i) = \frac{\mu}{x}$
 
 $\mathbb{V}(P_t) = \mathbb{V}(\sum_{i=1}^{t}{r_i})) = t\frac{\sigma^2}{x^2}$
 
-$\mathbb{E}(P_t) = t\frac{\mu}{x}$
+$\mathbb{E}(P_t) = t\frac{\sigma}{x}$
 
 \end{center}
 
@@ -307,7 +308,7 @@ $\mathbb{E}(P_t) = t\frac{\mu}{x}$
 
 \begin{center}
 
-$\sigma P_t = \frac{\sigma}{x}\sqrt{t}$
+$m P_t = \frac{s}{x}\sqrt{t}$
 
 \end{center}
 
