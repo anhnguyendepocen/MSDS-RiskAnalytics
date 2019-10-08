@@ -93,7 +93,7 @@ plot(as.data.frame(logR))
 
 par(mfrow = c(2, 2))
 for(i in colnames(logR)) {
-
+  
   qqnorm(logR[, i], datax = T, main = i)
   qqline(logR[, i], datax = T)
   print(shapiro.test(logR[, i]))
@@ -127,7 +127,7 @@ plot(density(logR[, 1]), lwd = 2, ylim = c(0, .5), xlim = c(-0.1, -0.05))
 lines(x, dstd(x, mean = mean(logR[, 1]), sd = mad_t, nu = df),
       lty = 5, lwd =2, col = "red")
 lines(x, dnorm(x, mean = mean(logR[, 1]), sd = sd(logR[, 1])),
-               lty = 3, lwd = 4, col = "blue")
+      lty = 3, lwd = 4, col = "blue")
 legend("topleft", c("KDE", paste("t: df = ", df), "normal"),
        lwd = c(2, 2, 4), lty = c(1, 5, 3),
        col = c("black", "red", "blue"))
