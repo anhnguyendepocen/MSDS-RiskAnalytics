@@ -22,15 +22,15 @@ prices <- getSymbols(symbols,
              auto.assign = T,
              warnings = F) %>%
           map(~Ad(get(.))) %>%
-          reduce(merge) %>%
-          `colnames<-`(symbols)
+  reduce(merge) %>%
+  `colnames<-`(symbols)
 
 # CSV
 prices <- read_csv("Reproducible Finance.csv",
                    col_types =
-                      cols(date =
+                     cols(date =
                             col_date(format = "%Y-%m-%d"))) %>%
-          tk_xts(date_var = date)
+  tk_xts(date_var = date)
 
 
 # Excel
@@ -123,7 +123,6 @@ asset_returns_tbltime <-
 
 head(asset_returns_tbltime)
 
-# convert from wide to long format.
 
 asset_returns_long <-
   asset_returns_dplyr_byhand %>%
@@ -158,12 +157,12 @@ hc_hist_fun <- function(n = 1, object, color ) {
   hc_hist <- hist(object[, symbols[n]],
                   breaks = 50,
                   plot = F)
-
+  
   hchart(hc_hist, color = color) %>%
     hc_title(text =
-             paste(symbols[n],
-                   "Log Returns Distribution",
-                   sep = " ")) %>%
+               paste(symbols[n],
+                     "Log Returns Distribution",
+                     sep = " ")) %>%
     hc_add_theme(hc_theme_flat()) %>%
     hc_exporting(enabled = F) %>%
     hc_legend(enabled = F)
@@ -227,3 +226,5 @@ asset_returns_long %>%
 
 
 
+
+# convert from wide to long format.
