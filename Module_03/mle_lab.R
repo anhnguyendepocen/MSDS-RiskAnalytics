@@ -97,7 +97,7 @@ fit_mle <- function(data, desc) {
   plot(x1, qsn(u, dp = est1), xlab = "data",
        ylab = "skew-t quantiles", main = desc)
   lmfit <- lm(qsn(c(0.25, 0.75), dp = est1) ~ quantile(x1, 
-          c(0.25, 0.75)))
+                                                       c(0.25, 0.75)))
   abline(lmfit)
 }
 
