@@ -31,7 +31,6 @@ ggplot(data.table(date = year_SP, return = SPreturn, direction = ifelse(SPreturn
   geom_bar(stat = 'identity') +
   theme(legend.position = "none")
 
-
 set.seed("991155")
 
 edf_norm <- ecdf(rnorm(150))
@@ -183,12 +182,19 @@ setwd(path.data)
 data <- read.csv("MCD_PriceDaily.csv", header = T)
 head(data)
 
+nrow(data)
+data[1,]$Date
+data[1177,]$Date
+
 adjPrice <- data[, 7]
 plot(adjPrice, type = "l", lwd = 2)
 
 n <- nrow(adjPrice)
 
 LogRet = diff(log(adjPrice))
+
+getRetVsT(LogRet)
+
 plot(data$Date[-1], LogRet, type='l', lwd=2, xlab='Date', ylab='logreturn')
 grid()
 
