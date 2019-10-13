@@ -104,7 +104,7 @@ getRetNormQuantiles <- function(returns, quantiles = c(0.25,0.1,0.05,0.025,0.01,
     p_value <- p
     n <- length(returns)
     q_range <- (1:n) / (n+1)
-  
+    
     data <- data.table(ret = returns, theoretical = qnorm(q_range))
     data$theoretical <- sort(data$theoretical)
     

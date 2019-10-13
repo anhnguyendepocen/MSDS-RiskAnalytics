@@ -52,9 +52,9 @@ boxplot(one.fourth.male.earnings, datax = T,
 par(mfrow = c(2, 2))
 plot(density(male.earnings), main = "untransformed")
 plot(density(sqrt.male.earnings),
-       main = "square-root transformed")
+     main = "square-root transformed")
 plot(density(log.male.earnings),
-       main = "log-transformed")
+     main = "log-transformed")
 plot(density(one.fourth.male.earnings),
      main = "1/4 power")
 

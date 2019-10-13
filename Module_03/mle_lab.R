@@ -161,17 +161,28 @@ loglik <- rep(0, n)
 for(i in 1:n){
   fit <- cov.trob(dat, nu = df)
   loglik[i] <- sum(log(dmt(dat, mean = fit$center,
-                   S = fit$cov, df = df[i])))
+                           S = fit$cov, df = df[i])))
 }
 
 aic_t <- -max(2 * loglik) + 2 * (4 + 10 + 1) + 64000
 z1 <- ( 2 * loglik > 2 * max(loglik) - qchisq(0.95, 1) )
+
+vals <- data.table( df = df, v_hat = 2 * loglik - 64000)
+
 plot(df, 2 * loglik - 64000, type = "l", cex.axis = 1.5,
      cex.lab = 1.5, ylab = "2 * loglikelihood - 64,000", lwd = 2)
 abline(h = 2 * max(loglik) - qchisq(0.95, 1) - 64000)
 abline(h = 2 * max(loglik) - 64000)
 abline(v = (df[16] + df[17]) / 2)
 abline(v = (df[130] + df[131]) / 2)
+
+v_hat <- vals[which(vals$v_hat == max(2*loglik - 64000))]
+
+cor(dat)
+c$cor
+
+c <-  cov.trob(dat, nu = v_hat$df)
+round(c$center, 7)
 
 fit
 
