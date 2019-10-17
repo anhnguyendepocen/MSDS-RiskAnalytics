@@ -188,7 +188,8 @@ $`r format(params.disp[1], scientific=F)`$ & $`r format(params.disp[2], scientif
 A = matrix( c(params[3], params[4], 0, params[5] ), 
             nrow=2, byrow=T )
 
-M.cov <- crossprod(A)
+df <- params[6]
+M.cov <- df / ( df - 2 ) * crossprod(A)
 
 kable(format(round(M.cov, 7), scientific = F), "latex", caption = "Covariate Matrix", booktabs = T) %>%
   kableExtra::kable_styling(latex_options = "hold_position")
@@ -203,7 +204,9 @@ kable(format(round(M.cov, 7), scientific = F), "latex", caption = "Covariate Mat
 
 ```{r, prob_4, echo = T}
 
-M.cor <- cov2cor(M.cov)
+p <- M.cov[1,2] / sqrt(M.cov[1,1]*M.cov[2,2])
+
+M.cor <- matrix(c(1, p, p, 1), nrow = 2)
 
 kable(format(round(M.cor, 7), scientific = F), caption = "MLE p, Correlation Matrix") %>%
   kableExtra::kable_styling(latex_options = "hold_position")

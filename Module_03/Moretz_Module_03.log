@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2019.7.28)  13 OCT 2019 15:39
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2019.7.28)  16 OCT 2019 14:20
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1155,27 +1155,27 @@ LaTeX Font Info:    Font shape `TU/Arial(0)/bx/it' will be
 Package xcolor Warning: Incompatible color definition on input line 256.
 
 
-Package xcolor Warning: Incompatible color definition on input line 266.
+Package xcolor Warning: Incompatible color definition on input line 267.
 
 
-Package xcolor Warning: Incompatible color definition on input line 266.
+Package xcolor Warning: Incompatible color definition on input line 267.
 
 [2]
 
-Package xcolor Warning: Incompatible color definition on input line 290.
+Package xcolor Warning: Incompatible color definition on input line 291.
 
 
-Package xcolor Warning: Incompatible color definition on input line 297.
+Package xcolor Warning: Incompatible color definition on input line 300.
 
 
-Package xcolor Warning: Incompatible color definition on input line 297.
+Package xcolor Warning: Incompatible color definition on input line 300.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 313.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 316.
 [3]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 313.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 316.
 (./Moretz_Module_03.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 313.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 313.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 316.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 316.
 Package rerunfilecheck Info: File `Moretz_Module_03.out' has not changed.
 (rerunfilecheck)             Checksum: CC79211562AE410E9FBC6258BC25A112.
  ) 
