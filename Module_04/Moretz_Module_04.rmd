@@ -342,12 +342,12 @@ Where,
 
 threshold <- .01
 
-# Method 1, book formula
+# Method 1: book formula
 
 x <- -sqrt( ( nu+1 ) * ( 1-rho ) / ( 1+rho ) )
 lambda <- 2 * pt( x, nu + 1)
 
-# Method 2, package function
+# Method 2: package function
 lambda2 <- fitLambda(data1, method = c("t"), p = min( 100 / nrow(data1), 0.1),
           lower.tail = TRUE, verbose = F)
 
