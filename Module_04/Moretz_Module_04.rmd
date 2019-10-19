@@ -194,15 +194,23 @@ data1 = cbind( pstd( ibm, mean=est.ibm[1], sd=est.ibm[2], nu=est.ibm[3] ),
 
 data2 = cbind( rank(ibm)/(n+1), rank(sp500)/(n+1) )
 
-ft1 = fitCopula(cop_t_dim2, data=data1, method="ml", start=c(omega,4))
-ft2 = fitCopula(cop_t_dim2, data=data2, method="ml", start=c(omega,4))
+ft1 = fitCopula(cop_t_dim2, data=data1, method="ml", start = c(omega,4))
+ft2 = fitCopula(cop_t_dim2, data=data2, method="ml", start = c(omega,4))
 
 ```
 
 ### Problem 2
 ###### Explain the difference between methods used to obtain the two estimates _ft1_ and _ft2_.
 
-For _ft1_ we pass in the probability
+Here we are fitting the copulas to the uniform-transformed data.
+
+__data1__ is computed using the probability density function for the standard t-distrubution, since we previously estimated the paramters to fit a t-distribution to the respective returns using the __fitdistr__ function above.
+
+__data2__ is computed using the percentile rank method.
+
+Both of these methods are calculating the cumulative density of the marginal values in IBM and SP500, respectively.
+
+Below we will have a quick visual inspection of the densities of the two methods.
 
 ```{r, marginal_density_1, fig.height=4, echo = F}
 
@@ -242,11 +250,18 @@ grid.arrange(p3, p4, nrow = 2, top  = "data2: Marginal Densities")
 
 ```{r, t_copula_fit_disp, echo = T}
 summary(ft1)
+
 summary(ft2)
+
 ```
 
+These two estimates are fairly close to each other for practical purposes. 
+
+However, I think method one would be a more robust estimte due to the estimates coming from the fitted t-distribution.
+
+\newpage
+
 ### Problem 3
-######
 
 Next, we will define a meta-_t_-distribution by specifying its _t_-copula and its univariate marginal distributions.
 
@@ -264,11 +279,68 @@ mvdc_t_t
 
 ```
 
-### Problem 4
-###### 
+Now we fit the meta _t_-distribution.
 
+```{r, fit_meta_t_mle, echo = T}
 
-```{r, prob_4, echo = T}
-
+start = c(est.ibm, est.sp500, ft1@estimate)
+objFn = function(param) -loglikMvdc( param, cbind(ibm,sp500), mvdc_t_t)
+tic = proc.time()
+ft = optim(start, objFn, method="L-BFGS-B",
+           lower = c(-.1,0.001,2.2, -0.1,0.001,2.2,  0.2,2.5),
+           upper = c( .1,   10, 15,  0.1,   10, 15,  0.9, 15) )
+toc = proc.time()
+total_time = toc - tic ; total_time[3]/60
 
 ```
+
+```{r, param_est, echo = F}
+
+params.disp <- round(ft$par, 6)
+rho <- ft$par[7]
+nu <- ft$par[8]
+
+```
+
+### What are the estimates of the copula parameters?
+
+For $C_{t(\Omega, v)}$
+
++ $\Omega = `r format(params.disp[7], scientific = F)`$
++ $\nu = `r format(params.disp[8], scientific = F)`$
+
+### What are the estimates of the parameters in the univariate marginal distributions?
+
+\begin{table}[H]
+\centering
+\caption{Marginal t-distribution estimates}
+\begin{tabular}{|l|l|l|l|}
+\hline
+Symbol & $\hat{\mu}$ & $\hat{\sigma}$ & $\hat{\nu}$ \\ \hline
+IBM & $`r format(params.disp[1], scientific=F)`$ & $`r format(params.disp[2], scientific=F)`$ & $`r format(params.disp[3], scientific=F)`$ \\ \hline
+SP500 & $`r format(params.disp[4], scientific=F)`$ & $`r format(params.disp[5], scientific=F)`$ & $`r format(params.disp[6], scientific=F)`$ \\ \hline
+\end{tabular}
+\end{table}
+
+### Was the estimation method maximum likelihood, semiparametric pseudo-maximum likelihood, or parametric pseudo-maximum likelihood?
+
+Here, since we are estimating the parameters of the marginal distributions with the parameters of the t-copula at the same time, this is a maximum likelihood estimate.
+
+### Estimate the coefficent of lower tail dependence for this copula.
+
+From __8.21__ we have:
+
+$\lambda_{\ell} = 2F_{t, \nu+1}\bigg\{- \sqrt{\frac{(\nu+1)(1-\rho)}{1 + \rho}}\bigg\}$
+
+Where,
+
++ $\nu = `r format(params.disp[7], scientific = F)`$
++ $\rho = `r format(params.disp[8], scientific = F)`$
+
+```{r, lower_tail_dependence, echo = T}
+
+ll <- 2 * pstd( - sqrt( (nu+1) * ( 1-rho) / (1+rho) ), nu + 1)
+
+```
+
+$\lambda_{\ell} = `r format(round(ll, 6), scientific = F)`$
