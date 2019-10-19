@@ -297,6 +297,7 @@ total_time = toc - tic ; total_time[3]/60
 ```{r, param_est, echo = F}
 
 params.disp <- round(ft$par, 6)
+
 rho <- ft$par[7]
 nu <- ft$par[8]
 
@@ -339,8 +340,20 @@ Where,
 
 ```{r, lower_tail_dependence, echo = T}
 
-ll <- 2 * pstd( - sqrt( (nu+1) * ( 1-rho) / (1+rho) ), nu + 1)
+threshold <- .01
+
+# Method 1, book formula
+
+x <- -sqrt( ( nu+1 ) * ( 1-rho ) / ( 1+rho ) )
+lambda <- 2 * pt( x, nu + 1)
+
+# Method 2, package function
+lambda2 <- fitLambda(data1, method = c("t"), p = min( 100 / nrow(data1), 0.1),
+          lower.tail = TRUE, verbose = F)
+
+# assert similarity
+stopifnot((lambda - lambda2$Lambda[1,2]) < threshold)
 
 ```
 
-$\lambda_{\ell} = `r format(round(ll, 6), scientific = F)`$
+$\lambda_{\ell} = `r format(round(lambda, 6), scientific = F)`$
