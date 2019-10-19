@@ -143,7 +143,7 @@ suppressWarnings({
 })
 
 est.ibm[2] = est.ibm[2] * sqrt( est.ibm[3] / (est.ibm[3]-2) )
-est.sp500[2] = est.sp500[2] * sqrt(est.sp500[3] / (est.sp500[3]-2) )
+est.sp500[2] = est.sp500[2] * sqrt( est.sp500[3] / (est.sp500[3]-2) )
 
 ```
 
@@ -257,7 +257,7 @@ summary(ft2)
 
 These two estimates are fairly close to each other for practical purposes. 
 
-However, I think method one would be a more robust estimte due to the estimates coming from the fitted t-distribution.
+However, I think method one would be a more robust estimate due to the marginals coming from a fitted t-distribution, versus a _truly uniform_ ranking.
 
 \newpage
 
