@@ -249,6 +249,7 @@ grid.arrange(p3, p4, nrow = 2, top  = "data2: Marginal Densities")
 ###### Do the two estimates seem significantly different (_in a practical sense_)?.
 
 ```{r, t_copula_fit_disp, echo = T}
+
 summary(ft1)
 
 summary(ft2)
@@ -331,7 +332,7 @@ Here, since we are estimating the parameters of the marginal distributions with 
 
 From __8.21__ we have:
 
-$\lambda_{\ell} = 2F_{t, \nu+1}\bigg\{- \sqrt{\frac{(\nu+1)(1-\rho)}{1 + \rho}}\bigg\}$
+$\lambda_{\ell} = 2F_{t, \nu+1}\bigg\{-\sqrt{\frac{(\nu+1)(1-\rho)}{1 + \rho}}\bigg\}$
 
 Where,
 
