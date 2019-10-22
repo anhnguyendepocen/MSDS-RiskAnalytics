@@ -29,8 +29,8 @@ header-includes:
    \setlength\headheight{30pt}
    \rhead{\color{headergrey}\today}
    \fancyhead[L]{\color{headergrey}Moretz, Brandon}
-   \fancyhead[C]{\Large\bfseries\color{headergrey}Fitting Copula Models to Bivariate Returns}
-   \rfoot{\color{headergrey}Module 4}
+   \fancyhead[C]{\Large\bfseries\color{headergrey}Daily Returns Analysis}
+   \rfoot{\color{headergrey}Module 5}
    \lfoot{\color{headergrey}MSDS 451}
    \fancyfoot[C]{\rmfamily\color{headergrey}Financial and Risk Analytics}
 geometry: left = 1cm, right = 1cm, top = 2cm, bottom = 3cm
@@ -82,6 +82,7 @@ library(Ecdat, quietly = TRUE, warn.conflicts = FALSE)
 library(MASS, quietly = TRUE, warn.conflicts = FALSE)
 library(copula, quietly = TRUE, warn.conflicts = FALSE)
 library(fGarch, quietly = TRUE, warn.conflicts = FALSE)
+library(forecast, quietly = TRUE, warn.conflicts = FALSE)
 
 options(tinytex.verbose = TRUE)
 suppressMessages(library("tidyverse"))
@@ -202,7 +203,7 @@ ft2 = fitCopula(cop_t_dim2, data=data2, method="ml", start = c(omega,4))
 ### Problem 2
 ###### Explain the difference between methods used to obtain the two estimates _ft1_ and _ft2_.
 
-Here we are fitting the copulas to the uniform-transformed data. One method is parameteric (the t-distribution) and one is non-parametric (uniform).
+Here we are fitting the copulas to the uniform-transformed data.
 
 __data1__ is computed using the probability density function for the standard t-distrubution, since we previously estimated the paramters to fit a t-distribution to the respective returns using the __fitdistr__ function above.
 
@@ -256,7 +257,7 @@ summary(ft2)
 
 ```
 
-These two estimates are fairly close to each other for practical purposes.
+These two estimates are fairly close to each other for practical purposes. 
 
 However, I think method one would be a more robust estimate due to the marginals coming from a fitted t-distribution, versus a _truly uniform_ ranking.
 
