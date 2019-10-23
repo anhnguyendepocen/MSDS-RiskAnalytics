@@ -253,8 +253,6 @@ legend(1975,14,c("data","predictions","lower CL","upper CL"),cex=1.2,
 #
 graphics.off()
 
-
-
 data(Mishkin,package="Ecdat")
 infl = as.vector(Mishkin[,1]) 
 
@@ -343,6 +341,24 @@ pdf("inflation_forecasts_sim_integrated.pdf")
 plot(1:n.ahead,ul_int,ylim=c(-5,15),type="b",lwd=2,xlab="month ahead",ylab="rate",cex.axis=1.5,cex.lab=1.5)
 lines(ll_int,type="b",lwd=2)
 lines(future_mean_int)
+#
+graphics.off()
+
+
+data(bmw,package="evir")
+
+pdf("BMW_pacf.pdf",width=6,height=5)
+#
+pacf(bmw,main="Sample PACF for daily BMW stock log returns")
+#
+graphics.off()
+
+data(Mishkin,package="Ecdat")
+infl = as.vector(Mishkin[,1])  
+
+pdf("Inflation_pacf.pdf",height=5,width=6)
+#
+pacf(diff(infl), main = "Change in inflation rate")
 #
 graphics.off()
 
