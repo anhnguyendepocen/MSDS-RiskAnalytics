@@ -39,8 +39,8 @@ output:
   pdf_document:
     fig_caption: yes
     latex_engine: xelatex
-  html_document:
-    df_print: paged
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -203,12 +203,10 @@ At lag 16, we accept the null hypothesis and conclude this is i.i.d, and the cor
 Next, we will fit AR(1) and AR(2) models to the CRSP returns:
 
 ```{r, ar-1-_model, echo = T}
-
 (fit1 <- arima(crsp, order = c(1, 0, 0)))
 ```
 
 ```{r, ar-2-_model, echo = T}
-
 (fit2 <- arima(crsp, order = c(2, 0, 0)))
 ```
 
@@ -216,12 +214,9 @@ In comparing these two models we would take the one with lower Akaike informatio
 
 ```{r, model-summary, echo = T}
 
-fit.sum <- data.table(Model = c("AR(1)", "AR(2)"), 
+pretty_kable(data.table(Model = c("AR(1)", "AR(2)"), 
                       AIC = c(AIC(fit1), AIC(fit2)), 
-                      BIC = c(BIC(fit1), BIC(fit2)))
-
-pretty_kable(fit.sum, "Model Fit Comparison")
-
+                      BIC = c(BIC(fit1), BIC(fit2))), "Model Fit Comparison")
 ```
 
 Here, we would take AR(1) over AR(2), irrespective of the preferred metric.
@@ -236,9 +231,49 @@ alpha <- 0.05
 
 ci <- fit1$model$phi + 0.019 * qnorm(1 - (alpha/2)) * c(-1, 1)
 
-pretty_kable(data.table(Lower = ci[1], Upper = ci[2]), "95 Confidence Interval")
+pretty_kable(data.table(Lower = ci[1], Upper = ci[2]), "95\\% Confidence Interval", dig = 5)
 
 ```
 
 \newpage
 
+### Problem 3
+
+Next, will look at EURUSD currency rate data on a one minute interval.
+
+
+```{r, eurusd_data, echo = T}
+
+eurusd <- read.csv(paste0(data.dir, "EURUSD mid.csv"), 
+                   header = F)
+
+head(eurusd)
+
+day <- eurusd[eurusd[1] == 20070724, 6]
+
+day.n <- length(day)
+day.returns <- diff(day)/day[1:(day.n-1)]
+
+length(day) / 60
+
+threshold <- 1e-5
+
+prices <- eurusd[, 6]
+n <- length(prices)
+returns <- diff(prices)/prices[1:(n-1)]
+
+dat <- data.table(ret = day.returns)
+
+n / 1425 / 365
+
+nrow(dat)
+
+sd(dat$ret)
+
+summary(dat$ret)
+
+ggplot(dat, aes(ret)) +
+   geom_histogram()
+
+
+```
