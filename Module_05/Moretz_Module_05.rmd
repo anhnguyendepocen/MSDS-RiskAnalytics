@@ -202,24 +202,23 @@ At lag 16, we accept the null hypothesis and conclude this is i.i.d, and the cor
 
 Next, we will fit AR(1) and AR(2) models to the CRSP returns:
 
-
 ```{r, ar-1-_model, echo = T}
 
-(fit1 <- summary(arima(crsp, order = c(1, 0, 0))))
-
+(fit1 <- arima(crsp, order = c(1, 0, 0)))
 ```
 
 ```{r, ar-2-_model, echo = T}
 
-(fit2 <- summary(arima(crsp, order = c(2, 0, 0))))
-
+(fit2 <- arima(crsp, order = c(2, 0, 0)))
 ```
 
 In comparing these two models we would take the one with lower Akaike information criterion (AIC), or Bayesian information criterion (BIC).
 
 ```{r, model-summary, echo = T}
 
-fit.sum <- data.table(Model = c("AR(1)", "AR(2)"), AIC = c(AIC(fit1), AIC(fit2)), BIC = c(BIC(fit1), BIC(fit2)))
+fit.sum <- data.table(Model = c("AR(1)", "AR(2)"), 
+                      AIC = c(AIC(fit1), AIC(fit2)), 
+                      BIC = c(BIC(fit1), BIC(fit2)))
 
 pretty_kable(fit.sum, "Model Fit Comparison")
 
@@ -227,18 +226,18 @@ pretty_kable(fit.sum, "Model Fit Comparison")
 
 Here, we would take AR(1) over AR(2), irrespective of the preferred metric.
 
-Find a 95% confidence interval for $\phi$ for the AR(1) model:
+\newpage
+
+#### Find a 95% confidence interval for $\phi$ for the AR(1) model:
 
 ```{r, ar_model_ci, echo = T}
 
 alpha <- 0.05
 
+ci <- fit1$model$phi + 0.019 * qnorm(1 - (alpha/2)) * c(-1, 1)
 
-ci_95 <- coef(fit1)[1] + 0.019 * qnorm(1 - (alpha/2)) * c(-1, 1)
+pretty_kable(data.table(Lower = ci[1], Upper = ci[2]), "95 Confidence Interval")
 
-fitted(fit1) + 1.96*sqrt(fit1$sigma2)
-
-ci(fit1)
 ```
 
 \newpage
