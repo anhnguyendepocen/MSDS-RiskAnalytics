@@ -242,38 +242,79 @@ pretty_kable(data.table(Lower = ci[1], Upper = ci[2]), "95\\% Confidence Interva
 Next, will look at EURUSD currency rate data on a one minute interval.
 
 
-```{r, eurusd_data, echo = T}
+```{r, eurusd_data, fig.height=4.5, echo = T}
 
 eurusd <- read.csv(paste0(data.dir, "EURUSD mid.csv"), 
                    header = F)
-
-head(eurusd)
-
-day <- eurusd[eurusd[1] == 20070724, 6]
-
-day.n <- length(day)
-day.returns <- diff(day)/day[1:(day.n-1)]
-
-length(day) / 60
-
-threshold <- 1e-5
 
 prices <- eurusd[, 6]
 n <- length(prices)
 returns <- diff(prices)/prices[1:(n-1)]
 
-dat <- data.table(ret = day.returns)
-
-n / 1425 / 365
-
-nrow(dat)
-
-sd(dat$ret)
-
-summary(dat$ret)
+dat <- data.table(ret = returns)
 
 ggplot(dat, aes(ret)) +
-   geom_histogram()
+   geom_histogram(aes(fill = ..count..), breaks = pretty(dat$ret)) +
+   labs(title = "EUR/USD 1 Minute Returns")
 
+pretty_kable(data.table( Mean = mean(returns), SD = sd(returns)), "EUR/USD Summary", dig = 5)
+
+```
+
+### Problem 4
+
+Now we will find the 'best' AR(p) model, __m0__, for the return series using the Bayesian information criterion.
+
+For the training data, we will use the first 1M bars.
+
+```{r, model_train, echo = T}
+
+train.size <- 1000000
+test.size <- 999
+
+data.train <- returns[1:train.size]
+data.test <- returns[train.size+1:test.size]
+
+stopifnot(length(data.train) == train.size & length(data.test) == test.size)
+
+summary(m0.train <- auto.arima(data.train, max.p = 20, max.q = 0, d = 0, ic = "bic"))
+
+```
+
+The best AR(p) model for the EUR/USD rates is an __AR(4)__ model.
+
+```{r, model_results_viz, fig.height=4, echo = T}
+
+summary(m0.test <- Arima(data.test, model = m0.train))
+
+m0.forecast <- forecast(m0.test)
+m0.results <- data.table(Actual = data.test, 
+                         Pred = m0.forecast$fitted, 
+                         Residual = m0.forecast$residuals)[, 
+                                                           Obs := .I]
+m0.results[, CDir := sign(Actual) == sign(Pred)]
+
+f1 <- ggplot(m0.results, aes(x = Obs)) +
+  geom_line(aes(y = Actual), lwd = .5, col = "black", alpha = .8) +
+  geom_line(aes(y = Pred), lwd = 1.5, col = "cornflowerblue", alpha = .7, linetype = 2) +
+  labs(title = "EUR/USD 1-M Return, Actual vs Predicted", y = "Return")
+
+f2 <- ggplot(m0.results, aes(x = Obs)) +
+   geom_line(aes(y = Actual)) +
+   geom_line(aes(y = ifelse(CDir == T, Actual, NA)), col = "green") +
+   geom_line(aes(y = ifelse(CDir == F, Actual, NA)), col = "red") +
+   labs(y = "Pred Directional Accuracy")
+
+grid.arrange(f1, f2, nrow = 2)
+
+```
+
+```{r, model_results, echo = T}
+
+m0.accuracy <- m0.results[, .(Correct = sum(CDir), Total = .N, 
+                             Pct = (sum(CDir) / .N) * 100, 
+                             Return = sum(ifelse(CDir == T, abs(Actual), 0))) * 100]
+
+pretty_kable(m0.accuracy, "m0 Prediction Accuracy", dig = 2)
 
 ```
