@@ -196,8 +196,6 @@ Box.test(crsp, lag = 16, type = "Ljung-Box")
 
 At lag 16, we accept the null hypothesis and conclude this is i.i.d, and the correlation is from randomness.
 
-\newpage
-
 ### Problem 2
 
 Next, we will fit AR(1) and AR(2) models to the CRSP returns:
@@ -221,7 +219,6 @@ pretty_kable(data.table(Model = c("AR(1)", "AR(2)"),
 
 Here, we would take AR(1) over AR(2), irrespective of the preferred metric.
 
-\newpage
 
 #### Find a 95% confidence interval for $\phi$ for the AR(1) model:
 
@@ -234,8 +231,6 @@ ci <- fit1$model$phi + 0.019 * qnorm(1 - (alpha/2)) * c(-1, 1)
 pretty_kable(data.table(Lower = ci[1], Upper = ci[2]), "95\\% Confidence Interval", dig = 5)
 
 ```
-
-\newpage
 
 ### Problem 3
 
@@ -303,7 +298,7 @@ f2 <- ggplot(m0.results, aes(x = Obs)) +
    geom_line(aes(y = Actual)) +
    geom_line(aes(y = ifelse(CDir == T, Actual, NA)), col = "green") +
    geom_line(aes(y = ifelse(CDir == F, Actual, NA)), col = "red") +
-   labs(y = "Pred Directional Accuracy")
+   labs(y = "Direction")
 
 grid.arrange(f1, f2, nrow = 2)
 
@@ -313,7 +308,7 @@ grid.arrange(f1, f2, nrow = 2)
 
 m0.accuracy <- m0.results[, .(Correct = sum(CDir), Total = .N, 
                              Pct = (sum(CDir) / .N) * 100, 
-                             Return = sum(ifelse(CDir == T, abs(Actual), 0))) * 100]
+                             Return = paste0(round(sum(ifelse(CDir == T, abs(Actual), 0)), 4) * 100, "%"))]
 
 pretty_kable(m0.accuracy, "m0 Prediction Accuracy", dig = 2)
 
