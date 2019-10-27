@@ -278,7 +278,7 @@ summary(m0.train <- auto.arima(data.train, max.p = 20, max.q = 0, d = 0, ic = "b
 
 ```
 
-#### "Best" Model
+### "Best" Model
 
 The best AR(p) model for the EUR/USD rates is an __AR(4)__ model.
 
@@ -337,16 +337,16 @@ data.backtest <- eurusd[(train.size+1):(train.size+test.size),]
 
 stopifnot(nrow(data.backtest) == test.size)
 
-transaction.fee <- 0.00 # Assume Frictionless Env
+transaction.fee <- .0 # Assume Frictionless Env
 
 data.backtest$Dir <- ifelse(sign(m0.results$Pred) == 1, "Long", 
                             ifelse(sign(m0.results$Pred) == -1, "Short", ""))
 
 data.backtest$Return <- 
    ifelse(data.backtest$Dir == "Long", 
-          ((data.backtest$Close - data.backtest$Open)/data.backtest$Close) - transaction.fee,
-          ifelse(data.backtest$Dir == "Short", 
-                 ((data.backtest$Open-data.backtest$Close)/data.backtest$Open) - transaction.fee, 0))
+          ((data.backtest$Close - data.backtest$Open)/data.backtest$Close) * ( 1 - transaction.fee),
+          ifelse(data.backtest$Dir == "Short",
+                 ((data.backtest$Open-data.backtest$Close)/data.backtest$Open) * ( 1 - transaction.fee), 0))
 
 data.backtest$CumRet <- sapply(data.backtest$Return + 1, cumprod) - 1
 
