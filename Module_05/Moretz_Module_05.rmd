@@ -296,7 +296,7 @@ m0.results <- data.table(Actual = data.test,
                          Residual = m0.forecast$residuals)[, 
                                                            Obs := .I]
 m0.results[, CDir := sign(Actual) == sign(Pred)]
-
+m0.forecast
 suppressWarnings({
    f1 <- ggplot(m0.results, aes(x = Obs)) +
      geom_line(aes(y = Actual), lwd = .5, col = "black", alpha = .8) +
