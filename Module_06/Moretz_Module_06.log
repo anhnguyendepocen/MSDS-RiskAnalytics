@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2019.7.28)  30 OCT 2019 10:59
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2019.7.28)  30 OCT 2019 20:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1098,10 +1098,10 @@ File: se-ascii-print.def 2016/05/16 v1.11 stringenc: Printable ASCII characters
 
 )
 
-Package xcolor Warning: Incompatible color definition on input line 173.
+Package xcolor Warning: Incompatible color definition on input line 170.
 
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 175.
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 172.
 
 Package xcolor Warning: Incompatible color definition on input line 191.
 
@@ -1112,46 +1112,138 @@ File: Moretz_Module_06_files/figure-latex/SP500_data-1.png Graphic file (type b
 mp)
 <Moretz_Module_06_files/figure-latex/SP500_data-1.png>
 
-Package xcolor Warning: Incompatible color definition on input line 197.
+Package xcolor Warning: Incompatible color definition on input line 200.
 
 LaTeX Font Info:    Font shape `TU/Arial(0)/m/n' will be
-(Font)              scaled to size 14.36246pt on input line 197.
+(Font)              scaled to size 14.36246pt on input line 200.
 LaTeX Font Info:    Font shape `TU/Arial(0)/bx/n' will be
-(Font)              scaled to size 14.36246pt on input line 197.
+(Font)              scaled to size 14.36246pt on input line 200.
 [1
 
 ]
 
-Package xcolor Warning: Incompatible color definition on input line 205.
+Package xcolor Warning: Incompatible color definition on input line 213.
 
 
-Package xcolor Warning: Incompatible color definition on input line 205.
+Package xcolor Warning: Incompatible color definition on input line 213.
+
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 236.
+
+(c:/Users/bmore/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ot1lmr.fd
+File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 236.
+
+(c:/Users/bmore/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omllmm.fd
+File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 236
+.
+(c:/Users/bmore/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omslmsy.fd
+File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 236
+.
+(c:/Users/bmore/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omxlmex.fd
+File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <12> on input line 236.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 236.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 236.
+LaTeX Font Info:    Try loading font information for U+msa on input line 236.
+(c:/Users/bmore/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 236.
+(c:/Users/bmore/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) [2]
+
+Package xcolor Warning: Incompatible color definition on input line 255.
 
 
-Package xcolor Warning: Incompatible color definition on input line 212.
+Package xcolor Warning: Incompatible color definition on input line 264.
 
 
-Package xcolor Warning: Incompatible color definition on input line 219.
+Package xcolor Warning: Incompatible color definition on input line 264.
 
 
-Package xcolor Warning: Incompatible color definition on input line 219.
+Package xcolor Warning: Incompatible color definition on input line 278.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 237.
-[2]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 237.
+
+Package xcolor Warning: Incompatible color definition on input line 305.
+
+
+Package xcolor Warning: Incompatible color definition on input line 305.
+
+File: Moretz_Module_06_files/figure-latex/Model_diag-1.png Graphic file (type b
+mp)
+<Moretz_Module_06_files/figure-latex/Model_diag-1.png>
+[3]
+
+Package xcolor Warning: Incompatible color definition on input line 328.
+
+
+Package xcolor Warning: Incompatible color definition on input line 340.
+
+
+Package xcolor Warning: Incompatible color definition on input line 340.
+
+File: Moretz_Module_06_files/figure-latex/ARARCH_model-1.png Graphic file (type
+ bmp)
+<Moretz_Module_06_files/figure-latex/ARARCH_model-1.png>
+[4]
+
+Package xcolor Warning: Incompatible color definition on input line 347.
+
+
+Package xcolor Warning: Incompatible color definition on input line 356.
+
+
+Package xcolor Warning: Incompatible color definition on input line 356.
+
+[5]
+
+Package xcolor Warning: Incompatible color definition on input line 394.
+
+
+Package xcolor Warning: Incompatible color definition on input line 404.
+
+
+Package xcolor Warning: Incompatible color definition on input line 404.
+
+File: Moretz_Module_06_files/figure-latex/AR_CGAUSS_model-1.png Graphic file (t
+ype bmp)
+<Moretz_Module_06_files/figure-latex/AR_CGAUSS_model-1.png>
+
+Package xcolor Warning: Incompatible color definition on input line 408.
+
+
+Package xcolor Warning: Incompatible color definition on input line 414.
+
+
+Package xcolor Warning: Incompatible color definition on input line 414.
+
+[6]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 468.
+[7]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 468.
 (./Moretz_Module_06.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 237.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 237.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 468.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 468.
 Package rerunfilecheck Info: File `Moretz_Module_06.out' has not changed.
-(rerunfilecheck)             Checksum: 0E0E404873D099866C53AF2DAE7B4326.
+(rerunfilecheck)             Checksum: A49FCDBBA90C0BBF5749BA0C8A8E76A0.
  ) 
 Here is how much of TeX's memory you used:
- 26850 strings out of 494894
- 493264 string characters out of 6175663
- 597403 words of memory out of 5000000
- 30510 multiletter control sequences out of 15000+600000
- 532980 words of font info for 48 fonts, out of 8000000 for 9000
+ 26972 strings out of 494894
+ 496581 string characters out of 6175663
+ 599051 words of memory out of 5000000
+ 30595 multiletter control sequences out of 15000+600000
+ 545248 words of font info for 65 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 53i,11n,116p,813b,446s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 53i,12n,116p,813b,446s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on Moretz_Module_06.pdf (2 pages).
+Output written on Moretz_Module_06.pdf (7 pages).
