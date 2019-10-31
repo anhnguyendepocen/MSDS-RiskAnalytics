@@ -217,9 +217,8 @@ Compute and plot the standardized residuals. Also, plot the ACF of the standardi
 plot_residuals <- function(res, sd, mname) {
    
    residual <- data.table(
-      res = res, 
       std = res / sd)[, 
-        res_sq := res*res][, 
+        res_sq := std*std][, 
                            index := .I]
    
    p1 <- ggplot(residual, aes(x = index, y = std)) +
@@ -243,7 +242,7 @@ plot_residuals(forecast@model$modeldata$residuals,
 
 ###### Does the model fit adequately?
 
-In the residual plot above, we see what appears to be white noise for the residual plots. Neither of the ACF plots display significant residual auto-correlation, so we would say this model fits reasonably well outside of a few points (specifically at lag 14 in the SR ACF and lag 2 in the SR^2 ACF). There is volatility clustering in the SR^2 between lags 5-10 and 15-20, but nothing significant.
+In the residual plot above, we see what appears to be white noise for the residual plots. Neither of the ACF plots display significant residual auto-correlation, so we would say this model fits reasonably well outside of a few points (specifically at lag 14 in the SR ACF). The SR^2 plot shows no significant autocorrelations, and we would conclude this model is of adequate fit.
 
 ### Problem 3.)
 ###### AR(1) + ARCH(1)
@@ -287,7 +286,7 @@ Depending on the IC, we would choose different models, however, the differences 
 ###### Does an AR(1) model with a Gaussian conditional distribution prove an adequate fit?
 
 
-```{r, AR_CGAUSS_model, fig.height=4, echo = T}
+```{r, AR_CGAUSS_model, fig.height=3.5, echo = T}
 
 
 fit3 <- arima( x, order = c(1, 0, 0))
@@ -305,6 +304,17 @@ pretty_kable(data.table(AIC = AIC(fit3) / fit3$nobs,
 ```
 
 Looking at the residual plots, we see similar characteristics of the previous models. There is some volatility clustering and the pronouced lags at 14 in the SR and 2 in the SR^2, and in general the lags are more pronounced in the Gaussian model. The information criterion is quite a bit higher in both AIC and BIC. I would say this model is not fully adequate, and would strongly prefer either of the two previous models.
+
+```{r, GAUSS_model_qq, fig.height=3, echo = F}
+
+   ggplot(data.table(res = as.vector(fit3$residuals / fit3$sigma2)), aes(sample = res)) +
+      geom_qq(lwd = .5) +
+      geom_qq_line() +
+      scale_x_continuous()
+
+```
+
+Moreover, the normal plot of the residuals shows extremely poor fit of the standardized residuals.
 
 \newpage
 
@@ -333,5 +343,8 @@ d.) What is $\mathbb{E}[\epsilon_t\epsilon_{t-1}]$ ?
 e.) What is the _unconditional_ variance of the process?
 
 Since
+
+$\lambda_a(0)$
+
 f.) Show that this correctly reduces to Ruppert Eq. 12.8 for unconditional variance of an AR(1) process.
 
