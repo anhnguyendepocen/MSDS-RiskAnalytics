@@ -263,7 +263,7 @@ plot_residuals(as.vector(residuals(fit2)),
 
 ```
 
-The residual diagnostics for the AR(1) + ARCH(1) are almost identical to the AR(1) + ARCH(1).
+The residual diagnostics for the AR(1) + ARCH(1) are close to the AR(1) + GARCH(1), however, in the SR^2 plot we start to see pronounced autocorrelations at lag 2, which is concerning.
 
 ```{r, model-compare, echo = T}
 
@@ -314,7 +314,7 @@ Looking at the residual plots, we see similar characteristics of the previous mo
 
 ```
 
-Moreover, the normal plot of the residuals shows extremely poor fit of the standardized residuals.
+Moreover, since the errors are assumed Gaussian, we can use the normal plot of the residuals to show the extremely poor fit of the standardized residuals at the tails.
 
 \newpage
 
@@ -330,21 +330,92 @@ is
 
 $\sigma_t^2 = \omega + \alpha a_{t - 1}^2 + \beta\sigma_{t -  1}^2$
 
-Where $\mu, \phi, \omega, \alpha, \beta$ are constant parameters.
+Where $\mu, \phi, \omega, \alpha, \beta$ are constant parameters.\newline 
 
-a.) What is $\mathbb{E}[Y_t - u]$ ?
+a.) What is $\mathbb{E}[Y_t - \mu]$ ?
+
+\setlength{\leftskip}{2cm}
+
+$\mathbb{E}[Y_t - \mu] = \mathbb{E}[\phi(Y_{t - 1} - \mu) + a_t]$,
+
+$\ldots{}=\phi\mathbb{E}[Y_{t - 1}-\mu] + \mathbb{E}[a_t]$,
+
+From __12.6__, we know that $\mathbb{E}[Y_t] = \mu~~\forall t$ and from __12.3__, $\mu = 0 ~~\forall t$, so that:
+
+$\ldots{} = \phi(0) + \mathbb{E}[\sigma_t\epsilon_t]$,
+
+$\ldots{} = \sigma_t\mathbb{E}[\epsilon_t]$,
+
+$\ldots{} = 0$\newline
+
+\setlength{\leftskip}{0pt}
 
 b.) What is $\mathbb{E}[\epsilon_t]$ ?
 
+\setlength{\leftskip}{2cm}
+
+From __14.3__ we know $\epsilon_t$ is i.i.d, or $\mathbb{E}(\epsilon_t | \epsilon_{t-1},\ldots) = 0$, so that $\mathbb{E}[\epsilon_t] = 0$
+
+\setlength{\leftskip}{0pt}
+
 c.) What is $\mathbb{E}[\epsilon_t^2]$ ?
+
+\setlength{\leftskip}{2cm}
+
+From __14.3__ we know $\mathbb{V}(\epsilon_t|\epsilon_{t-1}, \ldots) = 1$, or $\mathbb{V}(\epsilon_t) = 1$, because $\epsilon$ is i.i.d.
+
+Hence, $\mathbb{V}[X] = \mathbb{E}[X - \mu]^2 = \mathbb{E}[X^2] - \mu^2$
+
+$\mathbb{V}[\epsilon_t] = \mathbb{E}[\epsilon_t^2] - \{\mathbb{E}[\epsilon_t]\}^2$
+
+$\mathbb{E}[\epsilon_t^2] = \mathbb{V}(\epsilon_t) + \{\mathbb{E}[\epsilon_t]\}^2$
+
+$\{\mathbb{E}[\epsilon_t]\}^2$ = 0,
+
+So,
+
+$\mathbb{E}(\epsilon_t^2) = \mathbb{V}(\epsilon_t) = 1$\newline
+
+\setlength{\leftskip}{0pt}
 
 d.) What is $\mathbb{E}[\epsilon_t\epsilon_{t-1}]$ ?
 
+\setlength{\leftskip}{2cm}
+
+$Cov(\epsilon_t, \epsilon_{t-1}) = \mathbb{E}[\epsilon_t\epsilon_{t-1}] - \mathbb{E}[\epsilon_t]\mathbb{E}[\epsilon_{t-1}]$
+
+$Cov(\epsilon_t, \epsilon_{t-1}) = 0$, by independence of $\epsilon$.
+
+$\mathbb{E}[\epsilon_t] = \mathbb{E}[\epsilon_{t-1}] = 0$ from __b.__,
+
+$\mathbb{E}[\epsilon_t\epsilon_{t-1}]= Cov(\epsilon_t, \epsilon_{t-1}) + \mathbb{E}[\epsilon_t]\mathbb{E}[\epsilon_{t-1}] = 0$\newline
+
+\setlength{\leftskip}{0pt}
+
 e.) What is the _unconditional_ variance of the process?
 
-Since
+\setlength{\leftskip}{2cm}
 
-$\lambda_a(0)$
+$\mathbb{E}[\sigma_t^2] = \mathbb{E}[\omega + \alpha^2_{t-1} + \beta^2_{t-1}]$
+
+$\gamma_a(0) = \omega + \alpha\gamma_0 + \beta\gamma_0$
+
+$\gamma_a(0)[1 - \alpha - \beta] = \omega$
+
+$\gamma_a(0) = \frac{\omega}{1 - \alpha - \beta}$
+
+\setlength{\leftskip}{0pt}
 
 f.) Show that this correctly reduces to Ruppert Eq. 12.8 for unconditional variance of an AR(1) process.
 
+\setlength{\leftskip}{2cm}
+
+$Cov(Y_y,Y_{t+h}) = \phi^{|h|}\frac{\sigma^2_\epsilon}{1 - \phi^2}$
+
+$\ldots = Cov(Y_y,Y_{t+h}) = \frac{\phi^{|h|}\gamma_\alpha(0)}{1 - \phi^2}$
+
+From __e__, $\gamma_a(0) = \frac{\omega}{1 - \alpha - \beta}$
+
+$\ldots = Cov(Y_y,Y_{t+h}) = \frac{\phi^{|h|}[\frac{\omega}{1 - \alpha - \beta}]}{1 - \phi^2}$
+
+\setlength{\leftskip}{0pt}
