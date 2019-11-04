@@ -216,3 +216,120 @@ abline(h=sd,lty=5,col=2)
 legend("topright",c("marginal SD","conditional SD","next day's conditional SD"),
        lty=c(5,1,NA),pch=c(NA,NA,"*"),pt.cex=2.5, col=c(2,1,1))
 graphics.off()
+
+
+######################################################################################
+############  Code for Example 19.7 and Figures 19.4, 19.5, and 19.6   ###############
+######################################################################################
+data(SP500,package="Ecdat")
+library("fGarch")
+# daily observations from 1981?01 to 1991?04 
+# number of observations : 2783 
+# daily return S&P500 (change in log index) 
+n0 = 2783
+SPreturn = SP500$r500[(n0-999):n0]
+year = 1981 + (1:n0)* (1991.25-1981)/n0
+year = year[(n0-999):n0]
+n = length(SPreturn)
+x=sort(SPreturn)
+plot(SPreturn,xlim=c(0,50),type="b")
+pdf("SP500_tail_plots.pdf",width=6,height=5)   ##  Figure 19.4  ##
+par(mfrow=c(2,2))
+m = 50
+xx = log((1:m)/n)
+yy = log(-x[1:m])
+plot(xx ,yy,  xlab="log(k/n)",
+     ylab=expression(paste("log(-",R[(k)],")" )),main="(a) m=50")
+fit = lm(yy~xx)
+text(-4,-2,paste("slope = ",round(fit$coef[2],3)))
+text(-4,-2.25,paste("a = ",round(-1/fit$coef[2],3)))
+abline(fit,lwd=2)
+m = 100
+xx = log((1:m)/n)
+yy = log(-x[1:m])
+plot(xx ,yy,  xlab="log(k/n)",
+     ylab=expression(paste("log(-",R[(k)],")" )),main="(b) m=100")
+fit = lm(yy~xx)
+text(-3.5,-2,paste("slope = ",round(fit$coef[2],3)))
+text(-3.5,-2.35,paste("a = ",round(-1/fit$coef[2],3)))
+abline(fit,lwd=2)
+m = 200
+xx = log((1:m)/n)
+yy = log(-x[1:m])
+plot(xx ,yy,  xlab="log(k/n)",
+     ylab=expression(paste("log(-",R[(k)],")" )),main="(c) m=200")
+fit = lm(yy~xx)
+text(-2.8,-2,paste("slope = ",round(fit$coef[2],3)))
+text(-2.8,-2.35,paste("a = ",round(-1/fit$coef[2],3)))
+abline(fit,lwd=2)
+m = 300
+xx = log((1:m)/n)
+yy = log(-x[1:m])
+plot(xx ,yy,  xlab="log(k/n)",
+     ylab=expression(paste("log(-",R[(k)],")" )),main="(d) m=300")
+fit = lm(yy~xx)
+text(-3,-2,paste("slope = ",round(fit$coef[2],3)))
+text(-3,-2.45,paste("a = ",round(-1/fit$coef[2],3)))
+abline(fit,lwd=2)
+graphics.off()
+
+q = quantile(x,.1)
+print(q,digits=3)
+print(-20000*q,digits=3)
+a= 1.975
+print(1/a,digits=4)
+fitt = fitdistr(SPreturn,"t")
+param = as.numeric(fitt$estimate)
+mean = param[1]
+df = param[3]
+sd = param[2]*sqrt( (df)/(df-2) )
+lambda = param[2]
+alpha = seq(.002,.2,.0001)
+qalpha = qt(alpha,df=df)
+VaR_par = -20000*(mean + lambda*qalpha)
+VaR_norm = -20000*(mean(x)+ sd(x)* qnorm(alpha))
+pdf("var_sp500_est.pdf",width=6,height=5)                 ##  Figure 19.5  ##
+par(mfrow=c(1,1))
+plot(alpha, -20000*q * (.1/alpha)^(1/a),type="l",lwd=2,
+     xlab=expression(alpha),ylab=expression(paste("VaR(",alpha,")")),
+     ylim=c(0,1700),log="x" )
+a.hill=2.2
+lines(alpha, -20000*q * (.1/alpha)^(1/a.hill),lty=1,lwd=2,col="red")
+lines(alpha,VaR_par,lty=1,lwd=2,col="blue")
+lines(alpha,VaR_norm,lty=1,lwd=2,col="purple")
+legend("topright",c("polynomial tail: regression","polynomial tail: Hill","t","normal"),
+       col=c("black", "red", "blue", "purple"),lwd=2,lty=1)
+graphics.off()
+
+data(SP500,package="Ecdat")
+library("fGarch")
+# daily observations from 1981?01 to 1991?04 
+# number of observations : 2783 
+# daily return S&P500 (change in log index) 
+n0 = 2783
+SPreturn = SP500$r500[(n0-999):n0]
+year = 1981 + (1:n0)* (1991.25-1981)/n0
+year = year[(n0-999):n0]
+n = length(SPreturn)
+x=sort(SPreturn)
+plot(SPreturn,type="b")
+c = seq(quantile(SPreturn,.025),quantile(SPreturn,.25),by=.001)
+nc = 0*c
+den=nc
+hill=nc
+for (i in 1:length(nc))
+{
+  ind =  (x<c[i]) 
+  nc[i] = sum(ind)
+  den[i] = sum(  log(x[ind]/c[i])  )
+  hill[i] = nc[i]/den[i]
+}
+pdf("var_sp500_hill.pdf",width=5.25,height=2.25)      ##  Figure 19.6  ##
+par(mfrow=c(1,3))
+plot(nc,hill,type="b",main="(a)",ylab="Hill estimator")
+plot(nc,hill,xlim=c(25,120),ylim=c(2,2.4),type="b",main="(b)",ylab=
+       "Hill estimator")
+plot(nc,hill,xlim=c(60,100),ylim=c(2,2.4),type="b",main="(c)",ylab=
+       "Hill estimator")
+hill[8:11]
+graphics.off()
