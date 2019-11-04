@@ -426,7 +426,6 @@ date = attr(bmw,"time")
 #year = 1973 + (1996 + 7/12 - 1973)*(1:n)/n
 origin1 = 4100
 date[origin1]
-origin2 = 3880
 date[origin2]
 nahead = 1500
 
@@ -437,12 +436,13 @@ bmw.garch.norm.1 = ugarchfit(data=bmw[1:origin1], spec=garch.norm)
 pred1 = ugarchforecast(bmw.garch.norm.1, data = bmw[1:origin1], n.ahead = nahead)
 head(fitted(pred1))
 head(sigma(pred1))
+plot(pred1, which = 1)
 
 bmw.garch.norm.2 = ugarchfit(data=bmw[1:origin2], spec=garch.norm)
 pred2 = ugarchforecast(bmw.garch.norm.2, data = bmw[1:origin2], n.ahead = nahead)
 head(fitted(pred2))
 head(sigma(pred2))
-
+plot(pred2)
 library(xts)
 BMW = xts(bmw, attr(bmw,"times"))
 

@@ -346,6 +346,8 @@ $\ldots{} = \phi(0) + \mathbb{E}[\sigma_t\epsilon_t]$,
 
 $\ldots{} = \sigma_t\mathbb{E}[\epsilon_t]$,
 
+From __14.3__ we know $\epsilon_t$ is i.i.d, so that $\mathbb{E}[\epsilon_t] = 0$
+
 $\ldots{} = 0$\newline
 
 \setlength{\leftskip}{0pt}
