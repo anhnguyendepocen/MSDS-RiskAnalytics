@@ -211,10 +211,101 @@ $VaR_{p}^{norm}(\alpha) < VaR_{p_1}^{norm}(\alpha) + VaR_{p_2}^{norm}(\alpha)$
 
 \setlength{\leftskip}{0pt}
 
+\newpage
+
 #### Problem 2
 
-```{r, SP500_data, echo = T, fig.height = 4}
+```{r, stock_prices, echo = T, fig.height = 4}
 
+data <- read.csv(paste0(data.dir, "Stock_Bond.csv"),
+                 header = T)
+
+prices <- as.matrix(data[1:500, c(3, 5, 7, 9, 11)])
+
+n <- nrow(prices)
+
+returns <- apply(prices, 2, FUN = function( p ){
+   (p[-1] / p[1:n-1]) - 1
+})
 
 ```
 
+
++ What are the sample mean vector and sample covariance matrix of the 499 returns on these stocks?
+
+```{r, stock_stats, echo = T}
+
+stock.means <- colMeans(returns)
+stock.cov <- cov(returns)
+
+```
+
+```{r, stock_means, echo = F}
+
+mean_df <- as.data.frame(stock.means)
+colnames(mean_df) <- c("mu")
+
+pretty_kable(mean_df, "Stock Mean Returns", dig = 5)
+
+```
+
+```{r, stock_cov, echo = F}
+
+pretty_kable(stock.cov, "Covariance Matrix", dig = 5)
+
+```
+
+\newpage
+
++ How many shares of each stock should one buy to invest $50 million in an equally weighted portfolio?
+
+```{r, stock_shares, echo = T, fig.height = 4}
+
+capital <- 5e7
+
+n.stocks <- ncol(prices)
+n.shares <- as.data.frame((capital/n.stocks)/prices[500,])
+
+pretty_kable(data.table(Stock = rownames(n.shares), 
+                        Shares = comma(n.shares[,1])), "Equal Weighted Shares")
+
+```
+
+```{r, VaR_setup, echo = T, fig.height = 4}
+
+VaR_norm = function( alpha, mu, sgma, S ) {
+   - S * ( mu + qnorm(alpha) * sgma  )
+}
+
+stock.weight <- 1/n.stocks
+port.weights <- rep( stock.weight, n.stocks )
+
+port.ret <- sum(stock.weight * stock.means)
+port.var <- t(port.weights) %*% stock.cov %*% port.weights
+
+```
+
++ What is the one-day VaR(.01)$^*$ for this equally weighted portfolio? 
+
+```{r, VaR_1day, echo = T, fig.height = 4}
+
+var1d <- VaR_norm(0.1, port.ret, sqrt(port.var), S = 100000)
+
+```
+
+One-day _VaR(.01)_ = `r comma(var1d)`
+
++ What is the five-day VaR(0.1)$^*$ for this portfolio$^*$?
+
+```{r, VaR_5day, echo = T}
+
+port.ret <- 5 * sum( stock.weight * stock.means )
+port.var <- 5 * sum( (1/5)^2 * diag(stock.cov) )
+
+var5d <- VaR_norm(0.1, port.ret, sqrt(port.var), S = 100000 )
+
+```
+
+Five-day _VaR(.01)_ = `r comma(var5d)`
+
+$^*$ VaR estimates assume normality.
