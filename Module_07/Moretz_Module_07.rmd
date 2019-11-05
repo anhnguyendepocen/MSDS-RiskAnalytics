@@ -6,6 +6,7 @@ documentclass: report
 header-includes:
 - \PassOptionsToPackage{table}{xcolor}
 - \usepackage{caption}
+- \usepackage{amssymb}
 - \usepackage{booktabs}
 - \usepackage{longtable}
 - \usepackage{array}
@@ -126,11 +127,91 @@ panderOptions('keep.trailing.zeros', TRUE)
 
 ```
 
-### Problem Background
+#### Problem 1
 
-On Black Monday, the return on the S&P500 was _-22.8%_.
+Suppose the risk measure $\Re$ is $VaR(\alpha)$ for some $\alpha$.
 
-In this lab we are going to look at GARCH models and how they relate to predicting extreme events in financial markets. 
+Let $P_1$ and $P_2$ be two portfolios whos returns have a joint normal distribution with means $\mu_1$ and $\mu_2$, standard deviations $\sigma_1$ and $\sigma_2$, and correlation $\rho$.
+
+Suppose the initial investments are $S_1$ and $S_2$.
+
+Show that $\Re(P_1 + P_2) <= \Re(P_1) + \Re(P_2)$ under joint normality.
+
+#### Solution:
+
+From __19.12__, we know that:
+
+\setlength{\leftskip}{2cm}
+
+$\widehat{VaR}_{P_i}^{norm}(\alpha) = -S_i \ * \{\hat\mu_{P_i} + \phi^{-1}(\alpha)\hat\sigma_{P_i}\}$
+
+\setlength{\leftskip}{0pt}
+
+Where $S_i$ is the initial value of the portfolio $P_i$ for $i$ in 1, 2. Let the portfolio weights, w,
+
+\setlength{\leftskip}{2cm}
+   
+$w_1 = \frac{S_1}{S_1 + S_2}$
+
+$w_2 = \frac{S_2}{S_1 + S_2}$
+
+\setlength{\leftskip}{0pt}
+
+Such that,
+
+\setlength{\leftskip}{2cm}
+
+$\mu_P = w_1\mu_1 + w_2\mu_2$
+
+$\sigma^2_p = w_1\sigma^2_1 + w_2\sigma^2_1 + 2w_1w_2\sigma_1\sigma_2\rho$
+
+\setlength{\leftskip}{0pt}
+
+Where $\rho$ < 1, $w_1$ > 0 and $w_2$ > 0.
+
+\setlength{\leftskip}{2cm}
+
+Let $\rho_P < w_1\sigma1 + w_2\sigma_2$
+
+\setlength{\leftskip}{0pt}
+
+When $\alpha < 0.5$, then $\Phi^{-1}(\alpha) < 0$, so that
+
+\setlength{\leftskip}{2cm}
+
+$\Phi^{-1}(\alpha)\sigma_p > w_1\Phi^{-1}(\alpha)\sigma_1 + w_2\Phi^{-1}(\alpha)\sigma_2$
+
+\setlength{\leftskip}{0pt}
+
+Adding portfolio means from above,
+
+\setlength{\leftskip}{2cm}
+
+$\mu_p + \Phi^{-1}(\alpha)\sigma_p > w_1\mu_1 + w_1\Phi^{-1}(\alpha)\sigma_1 + w_2\mu_2 + w_2\Phi^{-1}(\alpha)\sigma_2$
+
+$\ldots = w_1(\mu_1 + \Phi^{-1}(\alpha)\sigma_1) + w_2(\mu_2 + \Phi^{-1}(\alpha)\sigma_2)$
+
+\setlength{\leftskip}{0pt}
+
+Multiplying both sides by -S,
+
+\setlength{\leftskip}{2cm}
+
+$-S\{\mu_p + \Phi^{-1}(\alpha)\sigma_p\} < -Sw_1(\mu_1 + \Phi^{-1}(\alpha)\sigma_1) - Sw_2(\mu_2 + \Phi^{-1}(\alpha)\sigma_2)$
+
+$\ldots = -S_1(\mu_1 + \Phi^{-1}(\alpha)\sigma_1) - S_2(\mu_2 + \Phi^{-1}(\alpha)\sigma_2)$
+
+\setlength{\leftskip}{0pt}
+
+Again using __19.12__,
+
+\setlength{\leftskip}{2cm}
+
+$VaR_{p}^{norm}(\alpha) < VaR_{p_1}^{norm}(\alpha) + VaR_{p_2}^{norm}(\alpha)$
+
+\setlength{\leftskip}{0pt}
+
+#### Problem 2
 
 ```{r, SP500_data, echo = T, fig.height = 4}
 
