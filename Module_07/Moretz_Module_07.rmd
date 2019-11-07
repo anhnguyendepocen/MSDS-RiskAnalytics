@@ -145,6 +145,8 @@ From __19.12__, we know that:
 
 $\widehat{VaR}_{P_i}^{norm}(\alpha) = -S_i \ * \{\hat\mu_{P_i} + \phi^{-1}(\alpha)\hat\sigma_{P_i}\}$
 
+$\ldots = -S_i \ * \{\hat\mu_{P_i} + Z_\alpha\hat\sigma_{P_i}\}$
+
 \setlength{\leftskip}{0pt}
 
 Where $S_i$ is the initial value of the portfolio $P_i$ for $i$ in 1, 2. Let the portfolio weights, w,
@@ -167,19 +169,19 @@ $\sigma^2_p = w_1\sigma^2_1 + w_2\sigma^2_1 + 2w_1w_2\sigma_1\sigma_2\rho$
 
 \setlength{\leftskip}{0pt}
 
-Where $\rho$ < 1, $w_1$ > 0 and $w_2$ > 0.
+Where $\rho \le 1$, $w_1$ > 0 and $w_2$ > 0.
 
 \setlength{\leftskip}{2cm}
 
-Let $\rho_P < w_1\sigma1 + w_2\sigma_2$
+Let $\rho_P \le w_1\sigma_1 + w_2\sigma_2$
 
 \setlength{\leftskip}{0pt}
 
-When $\alpha < 0.5$, then $\Phi^{-1}(\alpha) < 0$, so that
+When $\alpha < 0.5$, then $Z_\alpha < 0$, so that:
 
 \setlength{\leftskip}{2cm}
 
-$\Phi^{-1}(\alpha)\sigma_p > w_1\Phi^{-1}(\alpha)\sigma_1 + w_2\Phi^{-1}(\alpha)\sigma_2$
+$Z_\alpha\sigma_p \ge w_1Z_\alpha\sigma_1 + w_2Z_\alpha\sigma_2$
 
 \setlength{\leftskip}{0pt}
 
@@ -187,9 +189,9 @@ Adding portfolio means from above,
 
 \setlength{\leftskip}{2cm}
 
-$\mu_p + \Phi^{-1}(\alpha)\sigma_p > w_1\mu_1 + w_1\Phi^{-1}(\alpha)\sigma_1 + w_2\mu_2 + w_2\Phi^{-1}(\alpha)\sigma_2$
+$\mu_p + Z_\alpha\sigma_p \ge w_1\mu_1 + w_1Z_\alpha\sigma_1 + w_2\mu_2 + w_2Z_\alpha\sigma_2$
 
-$\ldots = w_1(\mu_1 + \Phi^{-1}(\alpha)\sigma_1) + w_2(\mu_2 + \Phi^{-1}(\alpha)\sigma_2)$
+$\ldots = w_1(\mu_1 + Z_\alpha\sigma_1) + w_2(\mu_2 + Z_\alpha\sigma_2)$
 
 \setlength{\leftskip}{0pt}
 
@@ -197,9 +199,9 @@ Multiplying both sides by -S,
 
 \setlength{\leftskip}{2cm}
 
-$-S\{\mu_p + \Phi^{-1}(\alpha)\sigma_p\} < -Sw_1(\mu_1 + \Phi^{-1}(\alpha)\sigma_1) - Sw_2(\mu_2 + \Phi^{-1}(\alpha)\sigma_2)$
+$-S\{\mu_p + Z_\alpha\sigma_p\} \le -Sw_1(\mu_1 + Z_\alpha\sigma_1) - Sw_2(\mu_2 + Z_\alpha\sigma_2)$
 
-$\ldots = -S_1(\mu_1 + \Phi^{-1}(\alpha)\sigma_1) - S_2(\mu_2 + \Phi^{-1}(\alpha)\sigma_2)$
+$\ldots = -S_1(\mu_1 + Z_\alpha\sigma_1) - S_2(\mu_2 + Z_\alpha\sigma_2)$
 
 \setlength{\leftskip}{0pt}
 
@@ -207,7 +209,7 @@ Again using __19.12__,
 
 \setlength{\leftskip}{2cm}
 
-$VaR_{p}^{norm}(\alpha) < VaR_{p_1}^{norm}(\alpha) + VaR_{p_2}^{norm}(\alpha)$
+$VaR_{p}^{norm}(\alpha) \le VaR_{p_1}^{norm}(\alpha) + VaR_{p_2}^{norm}(\alpha)$
 
 \setlength{\leftskip}{0pt}
 
@@ -259,7 +261,7 @@ pretty_kable(stock.cov, "Covariance Matrix", dig = 5)
 
 + How many shares of each stock should one buy to invest $50 million in an equally weighted portfolio?
 
-```{r, stock_shares, echo = T, fig.height = 4}
+```{r, stock_shares, echo = T}
 
 capital <- 5e7
 
@@ -271,7 +273,7 @@ pretty_kable(data.table(Stock = rownames(n.shares),
 
 ```
 
-```{r, VaR_setup, echo = T, fig.height = 4}
+```{r, VaR_setup, echo = T}
 
 VaR_norm = function( alpha, mu, sgma, S ) {
    - S * ( mu + qnorm(alpha) * sgma  )
@@ -287,9 +289,9 @@ port.var <- t(port.weights) %*% stock.cov %*% port.weights
 
 + What is the one-day VaR(.01)$^*$ for this equally weighted portfolio? 
 
-```{r, VaR_1day, echo = T, fig.height = 4}
+```{r, VaR_1day, echo = T}
 
-var1d <- VaR_norm(0.1, port.ret, sqrt(port.var), S = 100000)
+var1d <- VaR_norm(0.1, port.ret, sqrt(port.var), S = capital)
 
 ```
 
@@ -300,9 +302,9 @@ One-day _VaR(.01)_ = `r comma(var1d)`
 ```{r, VaR_5day, echo = T}
 
 port.ret <- 5 * sum( stock.weight * stock.means )
-port.var <- 5 * sum( (1/5)^2 * diag(stock.cov) )
+port.var <- 5 * sum( (1/5)**2 * diag(stock.cov) )
 
-var5d <- VaR_norm(0.1, port.ret, sqrt(port.var), S = 100000 )
+var5d <- VaR_norm(0.1, port.ret, sqrt(port.var), S = capital)
 
 ```
 

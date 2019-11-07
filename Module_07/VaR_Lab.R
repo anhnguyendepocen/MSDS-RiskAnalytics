@@ -333,3 +333,5 @@ plot(nc,hill,xlim=c(60,100),ylim=c(2,2.4),type="b",main="(c)",ylab=
        "Hill estimator")
 hill[8:11]
 graphics.off()
+
+qnorm()
