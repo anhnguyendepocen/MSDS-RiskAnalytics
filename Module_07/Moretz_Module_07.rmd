@@ -135,7 +135,7 @@ Let $P_1$ and $P_2$ be two portfolios whos returns have a joint normal distribut
 
 Suppose the initial investments are $S_1$ and $S_2$.
 
-Show that $\Re(P_1 + P_2) <= \Re(P_1) + \Re(P_2)$ under joint normality.
+Show that $\Re(P_1 + P_2) \le \Re(P_1) + \Re(P_2)$ under joint normality.
 
 #### Solution:
 
@@ -177,7 +177,7 @@ Let $\rho_P \le w_1\sigma_1 + w_2\sigma_2$
 
 \setlength{\leftskip}{0pt}
 
-When $\alpha < 0.5$, then $Z_\alpha < 0$, so that:
+When $\alpha < 0.5$ (reasonable for tail events), then $Z_\alpha < 0$, so that:
 
 \setlength{\leftskip}{2cm}
 
@@ -297,7 +297,7 @@ var1d <- VaR_norm(0.1, port.ret, sqrt(port.var), S = capital)
 
 One-day _VaR(.01)_ = `r comma(var1d)`
 
-+ What is the five-day VaR(0.1)$^*$ for this portfolio$^*$?
++ What is the five-day VaR(0.1)$^*$ for this portfolio?
 
 ```{r, VaR_5day, echo = T}
 
@@ -310,4 +310,4 @@ var5d <- VaR_norm(0.1, port.ret, sqrt(port.var), S = capital)
 
 Five-day _VaR(.01)_ = `r comma(var5d)`
 
-$^*$ VaR estimates assume normality.
+$^*$ VaR estimates assume normality of returns.
