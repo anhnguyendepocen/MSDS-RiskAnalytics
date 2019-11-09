@@ -149,23 +149,21 @@ $\ldots = -S_i \ * \{\hat\mu_{P_i} + Z_\alpha\hat\sigma_{P_i}\}$
 
 \setlength{\leftskip}{0pt}
 
-Where $S_i$ is the initial value of the portfolio $P_i$ for $i$ in 1, 2. Let the portfolio weights, w,
+Where $S_i$ is the initial value of the portfolio $P_i$ for $i$ in 1, 2. Let the portfolio weights, $w_i$,
 
 \setlength{\leftskip}{2cm}
    
-$w_1 = \frac{S_1}{S_1 + S_2}$
-
-$w_2 = \frac{S_2}{S_1 + S_2}$
+$w_1 = \frac{S_1}{S_1 + S_2}$, $w_2 = 1 - w_1$
 
 \setlength{\leftskip}{0pt}
 
-Such that,
+From __16.1__ and __16.3__, we know that,
 
 \setlength{\leftskip}{2cm}
 
-$\mu_P = w_1\mu_1 + w_2\mu_2$
+$\mathbb{E}(R_p) = \mu_P = w_1\mu_1 + w_2\mu_2$
 
-$\sigma^2_p = w_1\sigma^2_1 + w_2\sigma^2_1 + 2w_1w_2\sigma_1\sigma_2\rho$
+$\sigma^2_p = w_1\sigma^2_1 + w_2\sigma^2_1 + 2w_1w_2\rho_{12}\sigma_1\sigma_2$
 
 \setlength{\leftskip}{0pt}
 
@@ -275,8 +273,8 @@ pretty_kable(data.table(Stock = rownames(n.shares),
 
 ```{r, VaR_setup, echo = T}
 
-VaR_norm = function( alpha, mu, sgma, S ) {
-   - S * ( mu + qnorm(alpha) * sgma  )
+VaR_N = function( alpha, mu, v, S ) {
+   - S * ( mu + qnorm(alpha) * sqrt(v)  )
 }
 
 stock.weight <- 1/n.stocks
@@ -291,7 +289,7 @@ port.var <- t(port.weights) %*% stock.cov %*% port.weights
 
 ```{r, VaR_1day, echo = T}
 
-var1d <- VaR_norm(0.1, port.ret, sqrt(port.var), S = capital)
+var1d <- VaR_N(0.1, port.ret, port.var, capital)
 
 ```
 
@@ -302,9 +300,9 @@ One-day _VaR(.01)_ = `r comma(var1d)`
 ```{r, VaR_5day, echo = T}
 
 port.ret <- 5 * sum( stock.weight * stock.means )
-port.var <- 5 * sum( (1/5)**2 * diag(stock.cov) )
+port.var <- 5 * sum( stock.weight**2 * diag(stock.cov) )
 
-var5d <- VaR_norm(0.1, port.ret, sqrt(port.var), S = capital)
+var5d <- VaR_N(0.1, port.ret, port.var, capital)
 
 ```
 
