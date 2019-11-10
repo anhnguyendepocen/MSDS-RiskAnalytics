@@ -153,7 +153,7 @@ Where $S_i$ is the initial value of the portfolio $P_i$ for $i$ in 1, 2. Let the
 
 \setlength{\leftskip}{2cm}
    
-$w_1 = \frac{S_1}{S_1 + S_2}$, $w_2 = 1 - w_1$, so that $w_1 + w_2 = 1$
+$w_1 = \frac{S_1}{S_1 + S_2}$, $w_2 = 1 - w_1$, so that $w_1 + w_2 = 1$.
 
 \setlength{\leftskip}{0pt}
 
@@ -167,15 +167,11 @@ $\sigma^2_p = w_1\sigma^2_1 + w_2\sigma^2_1 + 2w_1w_2\rho_{12}\sigma_1\sigma_2$
 
 \setlength{\leftskip}{0pt}
 
-Where $\rho \le 1$, $w_1$ > 0 and $w_2$ > 0.
+Where $\rho \le 1$, $w_1$ > 0 and $w_2$ > 0.\newline
 
-\setlength{\leftskip}{2cm}
+Let $\rho_{P_{12}} \le w_1\sigma_1 + w_2\sigma_2$ and $\alpha < 0.5$*,\newline
 
-Let $\rho_{P_{12}} \le w_1\sigma_1 + w_2\sigma_2$
-
-\setlength{\leftskip}{0pt}
-
-When $\alpha < 0.5$ (reasonable for tail events), then $Z_\alpha < 0$, so that:
+then $Z_\alpha < 0$, so that:
 
 \setlength{\leftskip}{2cm}
 
@@ -207,9 +203,11 @@ Again using __19.12__,
 
 \setlength{\leftskip}{2cm}
 
-$VaR_{p}^{norm}(\alpha) \le VaR_{p_1}^{norm}(\alpha) + VaR_{p_2}^{norm}(\alpha)$
+$VaR_{p}^{norm}(\alpha) \le VaR_{p_1}^{norm}(\alpha) + VaR_{p_2}^{norm}(\alpha)$\newline\newline
 
 \setlength{\leftskip}{0pt}
+
+*Since we are interested in tail events.
 
 \newpage
 

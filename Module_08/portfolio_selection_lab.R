@@ -468,3 +468,81 @@ colMeans(out_NoShortShrink)
 colMeans(out_NoShort)
 sharpe_TRUE
 
+
+################################################################
+########## Code for figure 16.7  ###############################
+################################################################
+
+x = seq(0, 2, len = 300)
+l1 = 0.25
+l2 = 0.5
+l3 = 1
+l4 = 2
+l5 = 5
+c1 = 1 - exp(-l1)
+c2 = 1 - exp(-l2)
+c3 = 1 - exp(-l3)
+c4 = 1 - exp(-l4)
+c5 = 1 - exp(-l5)
+
+pdf("utility_functions.pdf", width = 6, height = 5)
+par(mfrow = c(1,1))
+plot(x, (1 - exp(-l1*x))/c1, lwd = 2, type ="l", 
+     ylab = expression(paste("U(x;",lambda,")") ) )
+lines(x, (1 - exp(-l2*x))/c2, lwd = 2, col = "red", lty = 2)
+lines(x, (1 - exp(-l3*x))/c3, lwd = 2, col = "blue", lty = 3)
+lines(x, (1 - exp(-l4*x))/c4, lwd = 2, col = "purple", lty = 4)
+lines(x, (1 - exp(-l5*x))/c5, lwd = 2, col = "cyan", lty = 4)
+legend("topleft", c( expression(paste(lambda, "= 0.25")), 
+                     expression(paste(lambda, "= 0.5")),
+                     expression(paste(lambda, "= 1")),
+                     expression(paste(lambda, "= 2")),
+                     expression(paste(lambda, "= 5"))
+), 
+col=c("black", "red", "blue", "purple", "cyan"), lty = 1:5, lwd= 2   )
+graphics.off()
+
+
+
+################################################################
+########## Code for Example 16.11  ################################
+################################################################
+
+library(quadprog)
+dat = read.csv("Stock_Bond.csv")
+y = dat[,c(3, 5, 7, 9, 11, 13, 15, 17, 19, 21)]
+n = dim(y)[1]
+m = dim(y)[2] - 1
+r = y[-1,]/y[-n,] - 1
+
+mean_vect = as.matrix(colMeans(r))
+cov_mat = cov(r)
+
+nlambda = 250
+loglambda_vect = seq(2, 8, length = nlambda)
+w_matrix = matrix(nrow = nlambda, ncol = 10)
+mu_vect = matrix(nrow = nlambda, ncol = 1)
+sd_vect = mu_vect
+ExUtil_vect = mu_vect
+conv_vect = mu_vect
+for (i in 1:nlambda)
+{
+  lambda = exp(loglambda_vect[i])
+  opt = solve.QP(Dmat = as.matrix(lambda^2 * cov_mat), dvec = lambda * mean_vect, 
+                 Amat = as.matrix(rep(1,10)), bvec = 1, meq = 1)
+  w = opt$solution
+  mu_vect[i] = w %*% mean_vect
+  sd_vect[i] = sqrt(w %*% cov_mat %*% w)
+  w_matrix[i,] = w
+  ExUtil_vect[i] = opt$value
+}
+
+pdf("utility_frontier.pdf", width = 6.5, height = 2.75)  ###  Figure 16.8
+par(mfrow = c(1, 3))
+plot(loglambda_vect, mu_vect, type = "l", lwd = 2, 
+     xlab = expression(paste("log(",lambda,")")), ylab = "E(return)"   )
+plot(loglambda_vect, sd_vect, type = "l", lwd = 2, 
+     xlab = expression(paste("log(",lambda,")")), ylab = "SD(return)"   )
+plot(sd_vect, mu_vect, type = "l", lwd = 2, xlab = "SD(return)",
+     ylab = "E(return)", main = "Efficient Frontier")
+graphics.off()
