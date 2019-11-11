@@ -271,15 +271,15 @@ pretty_kable(data.table(Stock = rownames(n.shares),
 
 ```{r, VaR_setup, echo = T}
 
-VaR_N = function( alpha, mu, v, S ) {
-   - S * ( mu + qnorm(alpha) * sqrt(v)  )
+VaR_N = function( alpha, mu, sig, S ) {
+   - S * ( mu + qnorm(alpha) * sig  )
 }
 
 stock.weight <- 1/n.stocks
 port.weights <- rep( stock.weight, n.stocks )
 
 port.ret <- sum(stock.weight * stock.means)
-port.var <- t(port.weights) %*% stock.cov %*% port.weights
+port.sd <- sqrt(port.weights %*% stock.cov %*% port.weights)
 
 
 ```
@@ -288,7 +288,7 @@ port.var <- t(port.weights) %*% stock.cov %*% port.weights
 
 ```{r, VaR_1day, echo = T}
 
-var1d <- VaR_N(0.1, port.ret, port.var, capital)
+var1d <- VaR_N(0.1, port.ret, port.sd, capital)
 
 ```
 
@@ -298,10 +298,7 @@ One-day _VaR(.01)_ = `r comma(var1d)`
 
 ```{r, VaR_5day, echo = T}
 
-port.ret <- 5 * sum( stock.weight * stock.means )
-port.var <- 5 * sum( stock.weight**2 * diag(stock.cov) )
-
-var5d <- VaR_N(0.1, port.ret, port.var, capital)
+var5d <- VaR_N(0.1, 5 * port.ret, sqrt(5) * port.sd, capital)
 
 ```
 
