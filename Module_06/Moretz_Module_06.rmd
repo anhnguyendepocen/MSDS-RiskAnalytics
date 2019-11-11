@@ -197,7 +197,9 @@ pretty_kable(p.vals, "Parameter Estimates", dig = 6)
 ret.pred <- fitted(forecast)
 ret.sd <- sigma(forecast)
 
-z_score <- as.numeric( ( ret.blm - ret.pred) / ret.sd )
+scale <- ret.sd * sqrt((dfhat-2)/dfhat)
+
+z_score <- as.numeric( ( ret.blm - ret.pred) / scale )
 
 bm.prob <- pt(z_score, dfhat, lower.tail = T)
 

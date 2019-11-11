@@ -281,7 +281,6 @@ port.weights <- rep( stock.weight, n.stocks )
 port.ret <- sum(stock.weight * stock.means)
 port.sd <- sqrt(port.weights %*% stock.cov %*% port.weights)
 
-
 ```
 
 + What is the one-day VaR(0.1)$^*$ for this equally weighted portfolio? 
