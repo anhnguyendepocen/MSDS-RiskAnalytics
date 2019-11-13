@@ -88,6 +88,7 @@ library(tseries, quietly = TRUE, warn.conflicts = FALSE)
 library(gmodels, quietly = TRUE, warn.conflicts = FALSE)
 library(rugarch, quietly = TRUE, warn.conflicts = FALSE)
 library(GGally, quietly = TRUE, warn.conflicts = FALSE)
+library(quadprog, quietly = TRUE, warn.conflicts = FALSE)
 
 options(tinytex.verbose = TRUE)
 suppressMessages(library("tidyverse"))
@@ -130,6 +131,15 @@ panderOptions('keep.trailing.zeros', TRUE)
 
 #### Problem Background
 
+Write an R program to find the efficient frontier, the tangency portfolio, and the minimum variance portfolio, and plot on "risk-reward space" the location of each of the six stocks, the efficent frontier, the tangency portfolio, and the line of efficient portfolios.
+
+Use the constraints that, $-0.1 \le w_j \le 0.5$ for each stock.
+
+The first constraint limits the short sales but does not rule them out completely.
+
+The second constraint prohibits more than 50% of the investment in any single stock.
+
+Assume that the annual risk-free rate is 3%.
 
 ```{r, stock_prices, echo = T}
 
@@ -143,12 +153,111 @@ n <- nrow(prices)
 
 returns <- data.table(100 * (prices[2:n,] / prices[1:(n-1),] - 1))
 
-mean_vec <- colMeans(returns)
-cov_mat <- cov(returns)
-sd_vect <- sqrt(diag(cov_mat))
+```
+
+```{r, pairplot, echo = F, fig.height=4.5, fig.width=8}
+ggpairs(returns)
+```
+
+```{r echo = T}
+cov.mat <- cov(returns)
+mean.vec <- colMeans(returns)
+sd.vec <- sqrt(diag(cov.mat))
+
+rfr <- 3.0 / 365 # Daily risk-free rate
+
+n.sims <- 500 # Simulations to find optimal allocation.
+n.stocks <- ncol(prices) # Stocks to allocate.
+
+# Storage.
+
+mu_p <- seq(min(mean.vec), max(mean.vec), length = n.sims)
+sd_p <- mu_p
+
+out.weights <- matrix(0, nrow = n.sims, ncol = n.stocks)
+
+# ?solve.QP
+
+c.vec <- c(-.10, .50) # Allocations between -10% and 50%.
+
+A.mat <- cbind(rep(1, n.stocks), mean.vec)
+b.vec <- c(1, NaN)
+
+# Lower-bound
+A.mat <- cbind(A.mat, diag(1, n.stocks))
+b.vec <- c(b.vec, c.vec[1]*rep(1, n.stocks))
+
+# Upper-bound
+A.mat <- cbind(A.mat, -diag(1, n.stocks))
+b.vec <- c(b.vec, -c.vec[2]*rep(1, n.stocks))
+
+for ( i in 1:n.sims )  # find the optimal portfolios for each target expected return
+{
+  b.vec[2] = +mu_p[i]  # constraint vector
+  
+  result =
+    solve.QP( Dmat = 2*cov.mat, 
+              dvec = rep(0, n.stocks),
+              Amat = A.mat, 
+              bvec = b.vec, 
+              meq = 2)
+  
+  sd_p[i] = sqrt(result$value)
+  out.weights[i, ] = result$solution
+}
+
+# Find maximum Sharpe's ratio
+sharpe.ratio <- ( mu_p - rfr) / sd_p
+tangent.index <- which.max(sharpe.ratio)
+
+# Get the weights of the tangency portfolio.
+tangent.weights <- out.weights[tangent.index,]
+
+stopifnot(sum(tangent.weights) == 1)
+
+# Find & show the minimum variance portfolio
+minvar.index <- (sd_p == min(sd_p))
+
+# Find & show the efficent frontier
+efficent.frontier = (mu_p > mu_p[minvar.index])
+
+# Find Sharpe Ratio of tangent portfolio.
+sharpe <- (mu_p[tangent.index]-rfr)/sd_p[tangent.index]
 
 ```
 
-```{r, pairplot, echo = T, fig.height=3.5}
-ggpairs(returns)
+
+```{r echo=T, fig.height=4.5, fig.width=8}
+
+plot(sd_p, mu_p, type="l", xlim=c(0,2.5), ylim=c(0,.15),lty=3)  #  plot
+points(0, rfr, cex=4,pch="*") # rfr
+
+lines( c(0, 3), rfr + c(0, 3)*(mu_p[tangent.index]-rfr)/sd_p[tangent.index],
+       lwd=2, lty=1, col = "blue")
+
+points( sd_p[minvar.index], mu_p[minvar.index], cex=2, pch="+") 
+
+lines( sd_p[efficent.frontier], mu_p[efficent.frontier], type="l",xlim=c(0, .25),
+      ylim=c(0,.3),lwd=3, col = "red")
+
+text(sd.vec[1], mean.vec[1], "GM", cex = 1.15)
+```
+
+```{r echo=T, fig.height=6, fig.width=8}
+
+suppressWarnings(print({
+   ggplot(data.table(cbind(sd_p, mu_p))) +
+      geom_abline(aes(intercept = 0, slope = sharpe), col = "cornflowerblue", lty = 4, lwd = 1) +
+      geom_point(aes(sd_p, mu_p), col = "black", lwd = .15, alpha = .7) +
+      geom_point(aes(0, rfr), col = "darkgreen", size = 3) +
+      scale_y_continuous(limits = c(0, .15), labels = scales::percent_format(scale = 1)) +
+      scale_x_continuous(limits = c(0, 2), labels = scales::percent_format(scale = 1)) +
+      labs(title = "Efficient Portfolios", x = "Risk", y = "Return") +
+      theme(axis.line = element_line(colour = "black"),
+         panel.grid.major = element_blank(),
+         panel.grid.minor = element_blank(),
+         panel.border = element_blank(),
+         panel.background = element_blank())
+}))
+
 ```

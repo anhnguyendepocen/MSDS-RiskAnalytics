@@ -49,6 +49,7 @@ riskp = sqrt(sig1^2 * wp^2 + sig2^2 * (1 - wp)^2)
 
 
 pdf("portfolioNew.pdf", width = 6, height = 5)
+
 plot(risk, means, type = "l", lwd = 1, xlim = c(0, 0.21), ylim = c(0.0575, 0.145))
 abline(v = 0)
 lines(risk[ind2], means[ind2], type = "l", lwd = 5, col = "red")
@@ -60,6 +61,7 @@ text(sig2, mu2, "R2", cex = 1.2)
 text(0, rf, "F", cex = 1.2)
 text(riskp, meanp, "P", cex = 1.2)
 text(min(risk), means[ind], "MV", cex = 1.2)
+
 graphics.off()
 
 
@@ -67,6 +69,7 @@ graphics.off()
 ########## Code for figure 16.2  ###############################
 ################################################################
 pdf("portfolio01New.pdf", width = 6, height = 5)
+
 par(mfrow = c(2, 2))
 mu1 = 0.14
 mu2 = 0.08
@@ -175,7 +178,8 @@ for (i in 1:length(muP))  # find the optimal portfolios for each target expected
   sdP[i] = sqrt(result$value)
   weights[i,] = result$solution
 }
-pdf("quad_prog_plot.pdf",width=6,height=5)              ######## Figure 16.3  #########
+pdf("quad_prog_plot.pdf",width=6,height=5)              
+######## Figure 16.3  #########
 par(mfrow = c(1,1))
 plot(sdP,muP,type="l",xlim=c(0,2.5),ylim=c(0,.15),lty=3)  #  plot
 # the efficient frontier (and inefficient portfolios
@@ -197,6 +201,7 @@ lines(sdP[ind3],muP[ind3],type="l",xlim=c(0,.25),
 text(sd_vect[1],mean_vect[1],"GE",cex=1.15)
 text(sd_vect[2],mean_vect[2],"IBM",cex=1.15)
 text(sd_vect[3],mean_vect[3],"Mobil",cex=1.15)
+
 graphics.off()
 
 
@@ -225,7 +230,9 @@ for (i in 1:length(muP))  # find the optimal portfolios for each target expected
   sdP[i] = sqrt(result$value)
   weights[i,] = result$solution
 }
+
 pdf("quad_prog_plotNoShort.pdf",width=6,height=5)       ##########  Figure 16.4  ############
+
 par(mfrow = c(1,1))
 plot(sdP,muP,type="l",xlim=c(0,2.5),ylim=c(0,.15),lty=3)  #  plot 
 # the efficient frontier (and inefficient frontier)
@@ -244,6 +251,7 @@ lines(sdP[ind3],muP[ind3],type="l",xlim=c(0,.25),
 text(sd_vect[1],mean_vect[1],"GE",cex=1.15)
 text(sd_vect[2],mean_vect[2],"IBM",cex=1.15)
 text(sd_vect[3],mean_vect[3],"Mobil",cex=1.51)
+
 graphics.off()
 
 
