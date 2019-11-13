@@ -252,17 +252,14 @@ suppressWarnings(print({
       geom_point(aes(0, rfr), col = "darkgreen", size = 3) +
       geom_text_repel(data = ef.data[tangent.index],
                   aes(0, rfr, label = "Risk-free Rate"),
-                  size          = 4,
-                  box.padding   = 1.5,
-                  force         = 20,
-                  segment.size  = 0.2,
-                  segment.color = "grey50",
-                  direction     = "x") +
+                  size = 4, box.padding = 1.5,
+                  force = 15, segment.size  = 0.2,
+                  segment.color = "grey50", direction = "x") +
    
       geom_point(data = ef.data[tangent.index], aes(sd_p, mu_p), col = "lightblue", size = 3) +
       geom_text_repel(data = ef.data[tangent.index],
                   aes(sd_p, mu_p, label = "Tangency"),
-                  size = 4, box.padding = 1.5,
+                  size = 4, box.padding = 2,
                   force = 30, segment.size  = 0.2,
                   segment.color = "grey50",
                   direction     = "x") +
@@ -277,9 +274,9 @@ suppressWarnings(print({
       geom_text_repel(data = ef.data[1,],
                   aes(sd_p, mu_p, label = "Efficent Frontier"),
                   size = 4, box.padding = 1.5,
-                  force = 10, segment.size  = 0.2,
+                  force = 20, segment.size  = 0.2,
                   segment.color = "grey50",
-                  direction = "y") +
+                  direction = "x") +
    
       geom_text(data = stocks.data, aes(x, y, label = symbol, col = symbol)) +
       
