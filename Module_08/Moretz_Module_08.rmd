@@ -271,7 +271,7 @@ suppressWarnings(print({
                   segment.size  = 0.2, segment.color = "grey50",
                   direction = "x") +
 
-      geom_text_repel(data = ef.data[1,],
+      geom_text_repel(data = ef.data[tangent.index - floor((tangent.index-minvar.index)/2),],
                   aes(sd_p, mu_p, label = "Efficent Frontier"),
                   size = 4, box.padding = 1.5,
                   force = 20, segment.size  = 0.2,
