@@ -104,7 +104,7 @@ summary(fit_NoInt)
 ##################################################
 ############  Code for R lab   ###############
 ##################################################
-dat = read.csv("Stock_Bond_2004_to_2006.csv",header=T)
+dat = read.csv(paste0(data.dir, "Stock_Bond_2004_to_2006.csv"),header=T)
 prices = dat[,c(5,7,9,11,13,15,17,24)]
 n = dim(prices)[1]
 
@@ -130,7 +130,7 @@ betas=fit_reg$coeff[2,]
 ############  Section 17.9.1  ####################
 ##################################################
 
-dat = read.csv("AlphaBeta.csv")
+dat = read.csv(paste0(data.dir, "AlphaBeta.csv"))
 alpha = dat$alpha
 beta = dat$beta
 library(linprog)
@@ -158,3 +158,4 @@ w[21:30]
 w[31:40]
 w[41:50]
 w %*% alpha
+
