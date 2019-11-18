@@ -178,6 +178,9 @@ for (i in 1:length(muP))  # find the optimal portfolios for each target expected
   sdP[i] = sqrt(result$value)
   weights[i,] = result$solution
 }
+
+bvec = c(1,muP[1])
+
 pdf("quad_prog_plot.pdf",width=6,height=5)              
 ######## Figure 16.3  #########
 par(mfrow = c(1,1))
