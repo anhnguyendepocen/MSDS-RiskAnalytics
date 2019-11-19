@@ -230,7 +230,7 @@ cov(stocks)
 ############  Code for Example 18.8 and Figures 18.9 and 18.10  ###############
 ###############################################################################
 
-berndtInvest = read.csv("berndtInvest.csv")
+berndtInvest = read.csv(paste0(data.dir, "berndtInvest.csv"))
 returns = berndtInvest[,-c(1,11,18)]
 ind_codes = as.factor(c(3,3,2,1,1,2,3,3,1,2,2,3,1,2,3))
 codes = as.matrix(model.matrix(~ind_codes))
@@ -272,7 +272,7 @@ graphics.off()
 ############  Code for Examples 18.9 and 18.10   ###############
 ################################################################
 
-equityFunds = read.csv("equityFunds.csv")
+equityFunds = read.csv(paste0(data.dir, "equityFunds.csv"))
 fa_none = factanal(equityFunds[,2:9],4,rotation="none")
 fa_vari = factanal(equityFunds[,2:9],4,rotation="varimax")
 print(fa_none,cutoff=0.1)

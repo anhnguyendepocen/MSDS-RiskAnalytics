@@ -139,17 +139,17 @@ Data for the Fama-French factors are avilable Prof. Kenneth French's website.
 
 Where RF is the risk-free rate and Mkt.RF, SMB and HML are the Fama-French factors.
 
-```{r, data_load, echo = T}
+```{r, factor_model, echo = T}
 
 # Stock/Bond/FX data.
 stocks <- as.data.table(read.csv(paste0(data.dir, "Stock_FX_Bond_2004_to_2005.csv"), 
                                  header=T))
 stocks$Date <- as.Date(stocks$Date, format = "%d-%b-%y")
 stocks_subset <- stocks[, .(Date, GM_AC, F_AC, UTX_AC, MRK_AC)]
-stocks_diff <- data.table(Date = stocks_subset[-1]$Date, 
-                          apply(log(stocks_subset[, .(GM_AC, F_AC, UTX_AC, MRK_AC)]), 2, diff))
+stocks_diff <- data.table(Date = stocks_subset[-1]$Date,
+                          100 * apply(log(stocks_subset[, .(GM_AC, F_AC, UTX_AC, MRK_AC)]), 2, diff))
 
-# French-Farma data.
+# Fama-French data.
 FF_data <- as.data.table(read.table(paste0(data.dir, "FamaFrenchDaily.txt"), 
                                     header=T))
 FF_data$Date <- as.Date(as.character(FF_data$date), format = "%Y%m%d")
@@ -165,12 +165,47 @@ capm.data <- consolidated.data[, .(Date,
                               Mkt.RF, SMB, HML, RF)]
 
 
-summary(fit <- lm(as.matrix(cbind(GM, Ford, UTX, Merck)) 
-                   ~ Mkt.RF + SMB + HML, data = capm.data))
+fit <- lm(as.matrix(cbind(GM, Ford, UTX, Merck)) 
+                   ~ Mkt.RF + SMB + HML, data = capm.data)
+```
+
+\newpage
+
+### 1.)  Which one(s) of the 4 stocks are "value" stocks, according to this model? How can you tell?
+
+```{r, echo=F}
+
+dt.ff <- as.data.table(coef(fit), keep.rownames = T)
+colnames(dt.ff)[1] <- 'Factor'
+dt.ff[1, 1] <- 'Beta'
+pretty_kable(dt.ff, "Fama-French Model", dig = 5)
+```
+
+A "value" stock is one with a positive HML (high minus low) coefficent, which would be __GM__ and __Ford__. __Merck__ looks like a _"growth"_ stock, and UTX is somewhere in between a "growth" and "value" stock.
+
+### 2.) Fama-French model fits which stock best? Worst?
+
+```{r, echo = T}
+lm.stats <- summary(fit)
+
+dt.stats <- data.table(stat = c("R-Squared", "Adj. R-Squared"), 
+            GM = c(lm.stats$`Response GM`$r.squared, 
+                   lm.stats$`Response GM`$adj.r.squared),
+            Ford = c(lm.stats$`Response Ford`$r.squared,
+                     lm.stats$`Response Ford`$adj.r.squared),
+            UTX = c(lm.stats$`Response UTX`$r.squared,
+                    lm.stats$`Response UTX`$adj.r.squared),
+            Merck = c(lm.stats$`Response Merck`$r.squared,
+                      lm.stats$`Response Merck`$adj.r.squared))
+dt.stats[, 2:5] <- dt.stats[, 2:5] * 100
+pretty_kable(dt.stats, "Model Fit Statistics", dig = 2)
 
 ```
 
-F
-```{r, echo=T}
+The Fama-French model fits __UTX__ the best, explaining roughtly 35% of the variance of the returns, and __Merck__ the worst, explaining about 6.6% of the return variance.
 
-```
+### 3.) For UTX, which factor is most important besides the market return?
+
+For __UTX__ the most important factor outside the market return is SMB, or small minus big, at _-30%_. A strong negative relationship with SMB means it behaves, unsurprisingly, like a large cap stock.
+
+\newpage
