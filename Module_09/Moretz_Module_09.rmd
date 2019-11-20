@@ -177,7 +177,7 @@ fit <- lm(as.matrix(cbind(GM, Ford, UTX, Merck))
 
 dt.ff <- as.data.table(coef(fit), keep.rownames = T)
 colnames(dt.ff)[1] <- 'Factor'
-dt.ff[1, 1] <- 'Beta'
+dt.ff[1, 1] <- 'Alpha'
 pretty_kable(dt.ff, "Fama-French Model", dig = 5)
 ```
 
@@ -209,3 +209,53 @@ The Fama-French model fits __UTX__ the best, explaining roughtly 35% of the vari
 For __UTX__ the most important factor outside the market return is SMB, or small minus big, at _-30%_. A strong negative relationship with SMB means it behaves, unsurprisingly, like a large cap stock.
 
 \newpage
+
+### 4.) Use the Fama-French model to predict the next day return of UTX. 
+
+Use the first 250 days (__the training set__) to fit the model. Note that this model will be different from the one above. Use this model to make 1-day forecasts for the rest of the data (__the test set__). 
+
+```{r, model_train, echo=T}
+
+utx.data <- capm.data[, .(Date, UTX, Mkt.RF, SMB, HML)]
+train.size <- 250
+test.size <- nrow(utx.data) - train.size
+
+train.data <- utx.data[1:train.size,]
+test.data <- utx.data[train.size+1:test.size,]
+
+stopifnot(nrow(train.data) == train.size & nrow(test.data) == test.size)
+
+summary(utx.fit <- lm(UTX ~ Mkt.RF + SMB + HML,
+                        data = train.data))
+
+```
+
+\newpage
+
++ What is the percentage of days in the test set where the sign of the forecast return agrees with that of the actual return? (sign=-1,0,1)
+
+```{r, echo=T}
+# Use the 1 day lagged prediction.
+# i.e, the sign of 1/3/05 close is using the FF data from 12/31/04.
+results <- data.table(Actual = test.data[-1]$UTX, 
+                      Pred = predict(utx.fit, newdata = head(test.data, -1)))
+results[, correct := sign(Actual) == sign(Pred)]
+results$Date <- test.data[-1]$Date
+
+pct.correct <- (nrow(results[correct == T]) / nrow(results)) * 100
+
+```
+
+Using the 3-factor model, we can correctly predict the sign of the next day return: __`r round(pct.correct, 2)`%__
+
+```{r, model_forecast, echo = T, fig.width=8}
+
+suppressWarnings(print({
+   ggplot(results, aes(x = Date)) +
+      geom_line(aes(y = Actual)) +
+      geom_line(aes(y = ifelse(correct == T, Actual, NA)), col = "darkgreen") +
+      geom_line(aes(y = ifelse(correct == F, Actual, NA)), col = "darkred") +
+      labs(title = "Fama-French 3-Factor Prediction")
+}))
+
+```
